@@ -10,17 +10,17 @@ VisualizationRenderer::VisualizationRenderer()
     static bool init = false;
     if(!init)
     {
-       gladLoadGL();
-       init = true;
+        gladLoadGL();
+        init = true;
     }
 }
 
 QOpenGLFramebufferObject* VisualizationRenderer::createFramebufferObject(const QSize &size)
- {
-     QOpenGLFramebufferObjectFormat format;
-     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-     // optionally enable multisampling by doing format.setSamples(4);
-     return new QOpenGLFramebufferObject(size, format);
+{
+    QOpenGLFramebufferObjectFormat format;
+    format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    // optionally enable multisampling by doing format.setSamples(4);
+    return new QOpenGLFramebufferObject(size, format);
 }
 
 void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
@@ -33,10 +33,18 @@ void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
     }
 }
 
- void VisualizationRenderer::render()
- {
+void VisualizationRenderer::render()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+
+    for(auto pass: m_passes)
+    {
+        pass->synchronize();
+    }
     for(auto pass: m_passes)
     {
         pass->render();
     }
- }
+}
+

@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.0)
 project(vis)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5Widgets)
@@ -15,8 +15,9 @@ set(SOURCES
     src/VisualizationFramebuffer.cpp
     src/VisualizationRenderer.cpp
     src/RenderPass.cpp
-    src/Entity.cpp
     src/Camera.cpp
+    src/TurnTableCamera.cpp
+    src/Entity.cpp
     src/Triangle.cpp
     src/Cube.cpp
 )
@@ -25,8 +26,9 @@ set(HEADERS
     include/VisualizationFramebuffer.h
     include/VisualizationRenderer.h
     include/RenderPass.h
-    include/Entity.h
     include/Camera.h
+    include/TurnTableCamera.h
+    include/Entity.h
     include/Triangle.h
     include/Cube.h
 )

@@ -1,7 +1,8 @@
 #include "Camera.h"
 #include <glm/gtc/type_ptr.hpp>
 
-Camera::Camera()
+Camera::Camera(QObject* parent):
+    QObject(parent)
 {
 
 }

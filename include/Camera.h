@@ -12,7 +12,7 @@ class Camera: public QObject
     Q_PROPERTY(QMatrix4x4 viewMatrix READ viewMatrix WRITE setViewMatrix NOTIFY viewMatrixChanged)
     Q_PROPERTY(QMatrix4x4 projectionMatrix READ projectionMatrix WRITE setProjectionMatrix NOTIFY projectionMatrixChanged)
 public:
-    Camera();
+    Camera(QObject* parent=0);
 
     virtual QMatrix4x4 viewMatrix() const;
     virtual QMatrix4x4 projectionMatrix() const;
