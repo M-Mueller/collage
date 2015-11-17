@@ -11,6 +11,7 @@ class Triangle: public Entity
     Q_OBJECT
 public:
     Triangle(QObject* parent=0);
+    virtual ~Triangle();
 
     void synchronize() override;
     void render(GlProgram& program) override;

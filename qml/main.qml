@@ -6,6 +6,7 @@ import visualizationframebuffer 1.0
 import RenderPass 1.0
 import Camera 1.0
 import Triangle 1.0
+import Cube 1.0
 
 ApplicationWindow {
     id: applicationWindow1
@@ -29,24 +30,14 @@ ApplicationWindow {
         }
     }
 
-    MessageDialog {
-        id: messageDialog
-        title: qsTr("May I have your attention, please?")
-
-        function show(caption) {
-            messageDialog.text = caption;
-            messageDialog.open();
-        }
-    }
-
     VisualizationFramebuffer {
         id: vis
         anchors.fill: parent
         transform: Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
 
         RenderPass {
-            vertexShaderPath: "/home/markus/Projects/vis/glsl/Triangle.vs"
-            fragmentShaderPath: "/home/markus/Projects/vis/glsl/Triangle.fs"
+            vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
+            fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
 
             camera: Camera {
                 viewMatrix: Qt.matrix4x4(1, 0, 0, 0,
@@ -59,7 +50,7 @@ ApplicationWindow {
                                          0, 0, 0, 1)
             }
 
-            Triangle {
+            Cube {
 
             }
         }

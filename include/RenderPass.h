@@ -18,6 +18,7 @@ class RenderPass: public QObject
     Q_CLASSINFO("DefaultProperty", "entities")
 public:
     RenderPass();
+    virtual ~RenderPass();
 
     QString vertexShaderPath() const;
     QString geometryShaderPath() const;

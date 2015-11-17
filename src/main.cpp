@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Triangle.h"
+#include "Cube.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
     qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
     qmlRegisterType<Triangle>("Triangle", 1, 0, "Triangle");
+    qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

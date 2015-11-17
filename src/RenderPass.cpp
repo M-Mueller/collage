@@ -5,10 +5,15 @@
 #include <grogl/GlProgram.h>
 
 RenderPass::RenderPass():
-    _program(0),
-    _camera(0)
+    _program(nullptr),
+    _camera(nullptr)
 {
 
+}
+
+RenderPass::~RenderPass()
+{
+    delete _program;
 }
 
 QString RenderPass::vertexShaderPath() const

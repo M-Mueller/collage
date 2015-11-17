@@ -10,6 +10,12 @@ Triangle::Triangle(QObject* parent):
 
 }
 
+Triangle::~Triangle()
+{
+    delete vao;
+    delete vbo;
+}
+
 void Triangle::synchronize()
 {
     if(!vbo && !vao)

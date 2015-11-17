@@ -18,6 +18,7 @@ set(SOURCES
     src/Entity.cpp
     src/Camera.cpp
     src/Triangle.cpp
+    src/Cube.cpp
 )
 
 set(HEADERS 
@@ -27,6 +28,7 @@ set(HEADERS
     include/Entity.h
     include/Camera.h
     include/Triangle.h
+    include/Cube.h
 )
 
 set(QML
