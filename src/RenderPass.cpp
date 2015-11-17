@@ -74,16 +74,16 @@ void RenderPass::synchronize()
             else
                 _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
         }
+    }
 
-        if(_camera)
-        {
-            _camera->synchronize();
-        }
+    if(_camera)
+    {
+        _camera->synchronize();
+    }
 
-        for(auto entity: _entities)
-        {
-            entity->synchronize();
-        }
+    for(auto entity: _entities)
+    {
+        entity->synchronize();
     }
 }
 
