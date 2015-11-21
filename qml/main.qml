@@ -1,15 +1,16 @@
-import QtQuick 2.5
-import QtQuick.Controls 1.4
-import QtQuick.Dialogs 1.2
+import QtQuick 2.5 as QtQuick
+import QtQuick.Controls 1.4 as QtControls
+import QtQuick.Dialogs 1.2 as QtDialog
 
 import visualizationframebuffer 1.0
 import RenderPass 1.0
+import Texture2D 1.0
 import Camera 1.0
 import TurnTableCamera 1.0
-import Triangle 1.0
+import Rectangle 1.0
 import Cube 1.0
 
-ApplicationWindow {
+QtControls.ApplicationWindow {
     id: applicationWindow1
     visible: true
     width: 640
@@ -17,14 +18,14 @@ ApplicationWindow {
     color: "#343434"
     title: qsTr("Hello World")
 
-    menuBar: MenuBar {
-        Menu {
+    menuBar: QtControls.MenuBar {
+        QtControls.Menu {
             title: qsTr("File")
-            MenuItem {
+            QtControls.MenuItem {
                 text: qsTr("&Open")
                 onTriggered: console.log("Open action triggered");
             }
-            MenuItem {
+            QtControls.MenuItem {
                 text: qsTr("Exit")
                 onTriggered: Qt.quit();
             }
@@ -34,9 +35,9 @@ ApplicationWindow {
     VisualizationFramebuffer {
         id: vis
         anchors.fill: parent
-        transform: Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
+        transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
 
-        MouseArea {
+        QtQuick.MouseArea {
             anchors.fill: parent;
             acceptedButtons: Qt.LeftButton
 
@@ -63,15 +64,18 @@ ApplicationWindow {
         }
 
         RenderPass {
-            vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
-            fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
+            vertexShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.vs"
+            fragmentShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.fs"
 
             camera: TurnTableCamera {
                 id: camera
             }
 
-            Cube {
-
+            Rectangle {
+                texture: Texture2D {
+                    id: tex
+                    source: ":/Test.png"
+                }
             }
         }
     }

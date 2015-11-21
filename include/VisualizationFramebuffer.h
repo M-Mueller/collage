@@ -3,8 +3,8 @@
 
 #include <QtQuick/QQuickFramebufferObject>
 
-#include "RenderPass.h"
-
+class RenderPass;
+class Texture2D;
 class VisualizationFramebuffer: public QQuickFramebufferObject
 {
 public:
@@ -13,6 +13,7 @@ public:
     Renderer* createRenderer() const;
 
     QList<RenderPass*> shaderPasses() const;
+    QList<Texture2D*> textures() const;
 };
 
 #endif // VISUALIZATIONFRAMEBUFFER_H

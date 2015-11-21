@@ -5,10 +5,11 @@
 
 #include "VisualizationFramebuffer.h"
 #include "RenderPass.h"
+#include "Texture2D.h"
 #include "Camera.h"
 #include "TurnTableCamera.h"
 #include "Entity.h"
-#include "Triangle.h"
+#include "Rectangle.h"
 #include "Cube.h"
 
 INITIALIZE_EASYLOGGINGPP
@@ -19,10 +20,11 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
+    qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
     qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
     qmlRegisterType<TurnTableCamera>("TurnTableCamera", 1, 0, "TurnTableCamera");
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
-    qmlRegisterType<Triangle>("Triangle", 1, 0, "Triangle");
+    qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
 
     QQmlApplicationEngine engine;

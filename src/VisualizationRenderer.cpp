@@ -1,5 +1,7 @@
 #include "VisualizationRenderer.h"
 #include "VisualizationFramebuffer.h"
+#include "RenderPass.h"
+#include "Texture2D.h"
 
 #include <glad/glad.h>
 
@@ -30,6 +32,10 @@ void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
     for(auto pass: m_passes)
     {
         pass->synchronize();
+    }
+    for(auto texture: vfb->textures())
+    {
+        texture->synchronize();
     }
 }
 

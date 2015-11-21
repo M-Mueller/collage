@@ -10,15 +10,18 @@ find_package(Qt5Widgets)
 set(GROGL_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/../grogl/include)
 set(GROGL_LIBRARIES optimized ${CMAKE_SOURCE_DIR}/../grogl-build-release/libgrogl.a debug ${CMAKE_SOURCE_DIR}/../grogl-build-debug/libgrogl.a)
 
+add_definitions(-DELPP_QT_LOGGING)
+
 set(SOURCES 
     src/main.cpp
     src/VisualizationFramebuffer.cpp
     src/VisualizationRenderer.cpp
     src/RenderPass.cpp
+    src/Texture2D.cpp
     src/Camera.cpp
     src/TurnTableCamera.cpp
     src/Entity.cpp
-    src/Triangle.cpp
+    src/Rectangle.cpp
     src/Cube.cpp
 )
 
@@ -26,10 +29,11 @@ set(HEADERS
     include/VisualizationFramebuffer.h
     include/VisualizationRenderer.h
     include/RenderPass.h
+    include/Texture2D.h
     include/Camera.h
     include/TurnTableCamera.h
     include/Entity.h
-    include/Triangle.h
+    include/Rectangle.h
     include/Cube.h
 )
 
@@ -41,5 +45,5 @@ qt5_add_resources(RESOURCES qml.qrc)
 
 include_directories(include ${GROGL_INCLUDE_DIRS})
 add_executable(vis ${SOURCES} ${HEADERS} ${RESOURCES} ${QML})
-target_link_libraries(vis ${GROGL_LIBRARIES} -ldl)
+target_link_libraries(vis ${GROGL_LIBRARIES} -ldl -lpng)
 qt5_use_modules(vis Core Gui Qml Quick Widgets)
