@@ -10,9 +10,3 @@ Entity::~Entity()
 {
 
 }
-
-void Entity::synchronize()
-{
-
-}
-

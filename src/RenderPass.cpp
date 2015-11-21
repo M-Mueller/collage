@@ -76,15 +76,7 @@ void RenderPass::synchronize()
         }
     }
 
-    if(_camera)
-    {
-        _camera->synchronize();
-    }
-
-    for(auto entity: _entities)
-    {
-        entity->synchronize();
-    }
+    RendererElement::synchronize();
 }
 
 void RenderPass::render()

@@ -1,12 +1,13 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <QObject>
-#include <QMatrix4x4>
+#include "RendererElement.h"
+#include <QtCore/QObject>
+#include <QtGui/QMatrix4x4>
 #include <grogl/GlProgram.h>
 #include <glm/glm.hpp>
 
-class Camera: public QObject
+class Camera: public QObject, public RendererElement
 {
     Q_OBJECT
     Q_PROPERTY(QMatrix4x4 viewMatrix READ viewMatrix WRITE setViewMatrix NOTIFY viewMatrixChanged)
@@ -17,7 +18,7 @@ public:
     virtual QMatrix4x4 viewMatrix() const;
     virtual QMatrix4x4 projectionMatrix() const;
 
-    void synchronize();
+    virtual void synchronize() override;
     void applyMatrices(GlProgram& program);
 
 public slots:

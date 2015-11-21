@@ -16,6 +16,7 @@ set(SOURCES
     src/main.cpp
     src/VisualizationFramebuffer.cpp
     src/VisualizationRenderer.cpp
+    src/RendererElement.cpp
     src/RenderPass.cpp
     src/Texture2D.cpp
     src/Camera.cpp
@@ -28,6 +29,7 @@ set(SOURCES
 set(HEADERS 
     include/VisualizationFramebuffer.h
     include/VisualizationRenderer.h
+    include/RendererElement.h
     include/RenderPass.h
     include/Texture2D.h
     include/Camera.h

@@ -21,6 +21,7 @@ void Camera::synchronize()
 {
     _r_viewMatrix = glm::make_mat4(_viewMatrix.constData());
     _r_projectionMatrix = glm::make_mat4(_projectionMatrix.constData());
+    RendererElement::synchronize();
 }
 
 void Camera::applyMatrices(GlProgram& program)

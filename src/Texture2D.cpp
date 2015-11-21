@@ -146,6 +146,8 @@ void Texture2D::synchronize()
             delete[] data;
         }
     }
+
+    RendererElement::synchronize();
 }
 
 GlTexture2D* Texture2D::gl()

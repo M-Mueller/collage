@@ -1,13 +1,14 @@
 #ifndef RENDERPASS_H
 #define RENDERPASS_H
 
-#include <QObject>
-#include <QQmlListProperty>
+#include "RendererElement.h"
+#include <QtCore/QObject>
+#include <QtQml/QQmlListProperty>
 
 class Entity;
 class Camera;
 class GlProgram;
-class RenderPass: public QObject
+class RenderPass: public QObject, public RendererElement
 {
     Q_OBJECT
     Q_PROPERTY(QString vertexShaderPath READ vertexShaderPath WRITE setVertexShaderPath)
@@ -24,7 +25,7 @@ public:
     QString geometryShaderPath() const;
     QString fragmentShaderPath() const;
 
-    virtual void synchronize();
+    virtual void synchronize() override;
     virtual void render();
 
     QQmlListProperty<Entity> entities();

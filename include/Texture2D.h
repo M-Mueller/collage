@@ -1,11 +1,12 @@
 #ifndef TEXTURE2D_H
 #define TEXTURE2D_H
 
-#include <QObject>
-#include <QImage>
+#include "RendererElement.h"
+#include <QtCore/QObject>
+#include <QtGui/QImage>
 
 class GlTexture2D;
-class Texture2D: public QObject
+class Texture2D: public QObject, public RendererElement
 {
     Q_OBJECT
     Q_PROPERTY(Type type READ type WRITE setType)
@@ -32,7 +33,7 @@ public:
     int channels() const;
     Type type() const;
 
-    virtual void synchronize();
+    virtual void synchronize() override;
 
     GlTexture2D* gl();
 

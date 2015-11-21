@@ -1,5 +1,6 @@
 #include "VisualizationRenderer.h"
 #include "VisualizationFramebuffer.h"
+#include "RendererElement.h"
 #include "RenderPass.h"
 #include "Texture2D.h"
 
@@ -29,13 +30,12 @@ void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
 {
     VisualizationFramebuffer* vfb = static_cast<VisualizationFramebuffer*>(item);
     m_passes = vfb->shaderPasses();
-    for(auto pass: m_passes)
+    for(auto child: vfb->children())
     {
-        pass->synchronize();
-    }
-    for(auto texture: vfb->textures())
-    {
-        texture->synchronize();
+        if(auto element = dynamic_cast<RendererElement*>(child))
+        {
+            element->synchronize();
+        }
     }
 }
 
@@ -44,10 +44,6 @@ void VisualizationRenderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    for(auto pass: m_passes)
-    {
-        pass->synchronize();
-    }
     for(auto pass: m_passes)
     {
         pass->render();
