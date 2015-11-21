@@ -16,7 +16,7 @@ class Texture2D: public QObject, public RendererElement
     Q_PROPERTY(QString source READ source WRITE setSource)
 
 public:
-    enum class Type
+    enum Type
     {
         Char,
         Short,

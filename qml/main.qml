@@ -6,6 +6,7 @@ import visualizationframebuffer 1.0
 import RenderPass 1.0
 import Texture2D 1.0
 import Camera 1.0
+import Framebuffer 1.0
 import TurnTableCamera 1.0
 import Rectangle 1.0
 import Cube 1.0
@@ -67,8 +68,17 @@ QtControls.ApplicationWindow {
             vertexShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.vs"
             fragmentShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.fs"
 
-            camera: TurnTableCamera {
-                id: camera
+            camera: Camera {
+            }
+
+            renderToTexture: Framebuffer {
+                colorAttachment0: Texture2D {
+                    id: target
+                    type: Texture2D.Char
+                    width: 256
+                    height: 256
+                    channels: 4
+                }
             }
 
             Rectangle {
@@ -76,6 +86,19 @@ QtControls.ApplicationWindow {
                     id: tex
                     source: ":/Test.png"
                 }
+            }
+        }
+
+        RenderPass {
+            vertexShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.vs"
+            fragmentShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.fs"
+
+            camera: TurnTableCamera {
+                id: camera
+            }
+
+            Rectangle {
+                texture: target
             }
         }
     }

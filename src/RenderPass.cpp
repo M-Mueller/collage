@@ -1,12 +1,15 @@
 #include "RenderPass.h"
 #include "Entity.h"
 #include "Camera.h"
+#include "Framebuffer.h"
 #include <QFile>
 #include <grogl/GlProgram.h>
+#include <grogl/GlFrameBuffer.h>
 
 RenderPass::RenderPass():
     _program(nullptr),
-    _camera(nullptr)
+    _camera(nullptr),
+    _renderToTexture(nullptr)
 {
 
 }
@@ -81,6 +84,19 @@ void RenderPass::synchronize()
 
 void RenderPass::render()
 {
+    GLint prevFBO;
+    GLint prevViewport[4];
+    if(_renderToTexture)
+    {
+        // backup current configuration
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
+        glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+        // bind framebuffer and set viewport to render to complete texture
+        _renderToTexture->gl()->bind();
+        glViewport(0, 0, _renderToTexture->width(), _renderToTexture->height());
+    }
+
     _program->activate();
     if(_camera)
     {
@@ -91,6 +107,13 @@ void RenderPass::render()
         entity->render(*_program);
     }
     _program->deactivate();
+
+    if(_renderToTexture)
+    {
+        // restore previous viewport
+        glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+        glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+    }
 }
 
 QQmlListProperty<Entity> RenderPass::entities()
@@ -135,6 +158,16 @@ int RenderPass::entityCount(QQmlListProperty<Entity>* list)
         return pass->_entities.count();
     }
     return 0;
+}
+
+Framebuffer* RenderPass::renderToTexture() const
+{
+    return _renderToTexture;
+}
+
+void RenderPass::setRenderToTexture(Framebuffer* renderToTexture)
+{
+    _renderToTexture = renderToTexture;
 }
 
 Camera* RenderPass::camera() const

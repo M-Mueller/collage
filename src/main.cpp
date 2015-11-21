@@ -7,6 +7,7 @@
 #include "RenderPass.h"
 #include "Texture2D.h"
 #include "Camera.h"
+#include "Framebuffer.h"
 #include "TurnTableCamera.h"
 #include "Entity.h"
 #include "Rectangle.h"
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
     qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
     qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
+    qmlRegisterType<Framebuffer>("Framebuffer", 1, 0, "Framebuffer");
     qmlRegisterType<TurnTableCamera>("TurnTableCamera", 1, 0, "TurnTableCamera");
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");

@@ -19,6 +19,7 @@ set(SOURCES
     src/RendererElement.cpp
     src/RenderPass.cpp
     src/Texture2D.cpp
+    src/Framebuffer.cpp
     src/Camera.cpp
     src/TurnTableCamera.cpp
     src/Entity.cpp
@@ -32,6 +33,7 @@ set(HEADERS
     include/RendererElement.h
     include/RenderPass.h
     include/Texture2D.h
+    include/Framebuffer.h
     include/Camera.h
     include/TurnTableCamera.h
     include/Entity.h

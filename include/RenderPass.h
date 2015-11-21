@@ -7,6 +7,7 @@
 
 class Entity;
 class Camera;
+class Framebuffer;
 class GlProgram;
 class RenderPass: public QObject, public RendererElement
 {
@@ -16,6 +17,7 @@ class RenderPass: public QObject, public RendererElement
     Q_PROPERTY(QString fragmentShaderPath READ fragmentShaderPath WRITE setFragmentShaderPath)
     Q_PROPERTY(Camera* camera READ camera WRITE setCamera)
     Q_PROPERTY(QQmlListProperty<Entity> entities READ entities)
+    Q_PROPERTY(Framebuffer* renderToTexture READ renderToTexture WRITE setRenderToTexture)
     Q_CLASSINFO("DefaultProperty", "entities")
 public:
     RenderPass();
@@ -29,14 +31,15 @@ public:
     virtual void render();
 
     QQmlListProperty<Entity> entities();
-
     Camera* camera() const;
+    Framebuffer* renderToTexture() const;
 
 public slots:
     void setVertexShaderPath(const QString& vertexShaderPath);
     void setGeometryShaderPath(const QString& geometryShaderPath);
     void setFragmentShaderPath(const QString& fragmentShaderPath);
     void setCamera(Camera* camera);
+    void setRenderToTexture(Framebuffer* renderToTexture);
 
 private:
     static void appendEntity(QQmlListProperty<Entity>* list, Entity* value);
@@ -52,6 +55,7 @@ private:
     GlProgram* _program;
     Camera* _camera;
     QList<Entity*> _entities;
+    Framebuffer* _renderToTexture;
 };
 
 
