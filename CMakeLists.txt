@@ -18,7 +18,9 @@ set(SOURCES
     src/VisualizationRenderer.cpp
     src/RendererElement.cpp
     src/RenderPass.cpp
+    src/Texture.cpp
     src/Texture2D.cpp
+    src/Texture3D.cpp
     src/Framebuffer.cpp
     src/Camera.cpp
     src/TurnTableCamera.cpp
@@ -32,7 +34,9 @@ set(HEADERS
     include/VisualizationRenderer.h
     include/RendererElement.h
     include/RenderPass.h
+    include/Texture.h
     include/Texture2D.h
+    include/Texture3D.h
     include/Framebuffer.h
     include/Camera.h
     include/TurnTableCamera.h

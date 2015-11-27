@@ -5,11 +5,9 @@
 #include "easylogging++.h"
 
 Texture2D::Texture2D(QObject* parent):
-    QObject(parent),
-    _type(Type::Char),
+    Texture(parent),
     _width(1),
     _height(1),
-    _channels(1),
     _tex(nullptr)
 {
 
@@ -42,19 +40,19 @@ int Texture2D::channels() const
 void Texture2D::setChannels(int channels)
 {
     if(_sourceImage.isNull())
-        _channels = glm::clamp(channels, 1, 4);
+        Texture::setChannels(channels);
 }
 
 Texture2D::Type Texture2D::type() const
 {
     assert(_sourceImage.isNull() || _type == Type::Char);
-    return _type;
+    return Texture::type();
 }
 
 void Texture2D::setType(const Type& type)
 {
     if(_sourceImage.isNull())
-        _type = type;
+        Texture::setType(type);
 }
 
 int Texture2D::height() const
