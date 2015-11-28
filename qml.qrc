@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>qml/main.qml</file>
         <file>Test.png</file>
+        <file>qml/VolumeRenderer.qml</file>
     </qresource>
 </RCC>

@@ -22,6 +22,7 @@ set(SOURCES
     src/Texture2D.cpp
     src/Texture3D.cpp
     src/Framebuffer.cpp
+    src/RenderBuffer.cpp
     src/Camera.cpp
     src/TurnTableCamera.cpp
     src/Entity.cpp
@@ -38,6 +39,7 @@ set(HEADERS
     include/Texture2D.h
     include/Texture3D.h
     include/Framebuffer.h
+    include/RenderBuffer.h
     include/Camera.h
     include/TurnTableCamera.h
     include/Entity.h
@@ -47,6 +49,7 @@ set(HEADERS
 
 set(QML
     qml/main.qml
+    qml/VolumeRenderer.qml
 )
 
 qt5_add_resources(RESOURCES qml.qrc)

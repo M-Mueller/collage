@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include "RendererElement.h"
+#include "Framebuffer.h"
 #include <QtCore/QObject>
 
 class Texture: public QObject, public RendererElement
@@ -17,7 +18,11 @@ public:
         Short,
         UnsignedShort,
         HalfFloat,
-        Float
+        Float,
+        Depth16,
+        Depth24,
+        Depth32,
+        Depth32F
     };
     Q_ENUM(Type)
 
@@ -29,6 +34,8 @@ public:
 
     /// Returns the size of the Type in byte
     static int typeSize(Type type);
+
+    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) =0;
 
 public slots:
     virtual void setChannels(int channels);

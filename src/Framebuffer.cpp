@@ -1,12 +1,11 @@
 #include "Framebuffer.h"
+#include "Texture.h"
 #include <grogl/GlFrameBuffer.h>
 
 Framebuffer::Framebuffer():
     _color0(nullptr),
     _color1(nullptr),
-    _fbo(nullptr),
-    _width(0),
-    _height(0)
+    _fbo(nullptr)
 {
 
 }
@@ -29,43 +28,34 @@ void Framebuffer::synchronize()
     {
         _fbo->bind();
         if(_color0)
-            _fbo->attach(*_color0->gl(), 0);
+            _color0->attachTo(*this, Color0);
         if(_color1)
-            _fbo->attach(*_color1->gl(), 0);
+            _color1->attachTo(*this, Color1);
+        if(_depth)
+            _depth->attachTo(*this, Depth);
         _fbo->assignDrawBuffers();
         _fbo->release();
     }
 }
 
-Texture2D* Framebuffer::colorAttachment0() const
+Texture* Framebuffer::depthAttachment() const
+{
+    return _depth;
+}
+
+Texture* Framebuffer::colorAttachment0() const
 {
     return _color0;
 }
 
-void Framebuffer::setColorAttachment0(Texture2D* colorAttachment0)
+void Framebuffer::setColorAttachment0(Texture* colorAttachment0)
 {
     _color0 = colorAttachment0;
 }
 
-Texture2D* Framebuffer::colorAttachment1() const
+Texture* Framebuffer::colorAttachment1() const
 {
     return _color1;
-}
-
-int Framebuffer::width()
-{
-    if(_width <= 0)
-        return _color0->width();
-    else
-        return _width;
-}
-
-int Framebuffer::height()
-{
-    if(_height <= 0)
-        return _color0->height();
-    else
-        return _height;
 }
 
 GlFrameBuffer* Framebuffer::gl()
@@ -73,7 +63,12 @@ GlFrameBuffer* Framebuffer::gl()
     return _fbo;
 }
 
-void Framebuffer::setColorAttachment1(Texture2D* colorAttachment1)
+void Framebuffer::setDepthAttachment(Texture* depth)
+{
+    _depth = depth;
+}
+
+void Framebuffer::setColorAttachment1(Texture* colorAttachment1)
 {
     _color1 = colorAttachment1;
 }

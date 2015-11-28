@@ -2,41 +2,47 @@
 #define FRAMEBUFFER_H
 
 #include "RendererElement.h"
-#include "Texture2D.h"
 #include <QtCore/QObject>
 
 class GlFrameBuffer;
+class Texture;
 class Framebuffer: public QObject, public RendererElement
 {
     Q_OBJECT
-    Q_PROPERTY(Texture2D* colorAttachment0 READ colorAttachment0 WRITE setColorAttachment0)
-    Q_PROPERTY(Texture2D* colorAttachment1 READ colorAttachment1 WRITE setColorAttachment1)
+    Q_PROPERTY(Texture* colorAttachment0 READ colorAttachment0 WRITE setColorAttachment0)
+    Q_PROPERTY(Texture* colorAttachment1 READ colorAttachment1 WRITE setColorAttachment1)
+    Q_PROPERTY(Texture* depthAttachment READ depthAttachment WRITE setDepthAttachment)
 
 public:
+    enum Attachment
+    {
+        Color0 = 0,
+        Color1 = 1,
+        Depth = 32
+    };
+
     Framebuffer();
     virtual ~Framebuffer();
 
     virtual void synchronize() override;
 
-    Texture2D* colorAttachment0() const;
-    Texture2D* colorAttachment1() const;
-
-    int width();
-    int height();
+    Texture* colorAttachment0() const;
+    Texture* colorAttachment1() const;
+    Texture* depthAttachment() const;
 
     GlFrameBuffer* gl();
 
 public slots:
-    void setColorAttachment0(Texture2D* colorAttachment0);
-    void setColorAttachment1(Texture2D* colorAttachment1);
+    void setColorAttachment0(Texture* colorAttachment0);
+    void setColorAttachment1(Texture* colorAttachment1);
+    void setDepthAttachment(Texture* depth);
 
 private:
-    Texture2D* _color0;
-    Texture2D* _color1;
+    Texture* _color0;
+    Texture* _color1;
+    Texture* _depth;
 
     GlFrameBuffer* _fbo;
-    int _width;
-    int _height;
 };
 
 #endif // FRAMEBUFFER_H

@@ -1,13 +1,14 @@
 #include "Texture2D.h"
 #include <grogl/GlTexture2D.h>
+#include <grogl/GlFrameBuffer.h>
 #include <glm/glm.hpp>
 
 #include "easylogging++.h"
 
 Texture2D::Texture2D(QObject* parent):
     Texture(parent),
-    _width(1),
-    _height(1),
+    _width(0),
+    _height(0),
     _tex(nullptr)
 {
 
@@ -26,8 +27,8 @@ int Texture2D::width() const
 
 void Texture2D::setWidth(int width)
 {
-    if(_width <= 0)
-        width = 1;
+    if(width < 0)
+        width = 0;
     _width = width;
 }
 
@@ -62,8 +63,8 @@ int Texture2D::height() const
 
 void Texture2D::setHeight(int height)
 {
-    if(height <= 0)
-        height = 1;
+    if(height < 0)
+        height = 0;
     _height = height;
 }
 
@@ -95,7 +96,11 @@ void Texture2D::synchronize()
         {{1, Type::Float}, GlTexture::InternalFormat::R32F},
         {{2, Type::Float}, GlTexture::InternalFormat::RG32F},
         {{3, Type::Float}, GlTexture::InternalFormat::RGB32F},
-        {{4, Type::Float}, GlTexture::InternalFormat::RGBA32F}
+        {{4, Type::Float}, GlTexture::InternalFormat::RGBA32F},
+        {{1, Type::Depth16}, GlTexture::InternalFormat::DepthComponent16},
+        {{1, Type::Depth24}, GlTexture::InternalFormat::DepthComponent24},
+        {{1, Type::Depth32}, GlTexture::InternalFormat::DepthComponent32},
+        {{1, Type::Depth32F}, GlTexture::InternalFormat::DepthComponent32F}
     };
 
 
@@ -159,6 +164,19 @@ void Texture2D::synchronize()
 GlTexture2D* Texture2D::gl()
 {
     return _tex;
+}
+
+void Texture2D::attachTo(Framebuffer& fbo, Framebuffer::Attachment pos)
+{
+    GlFrameBuffer* gl = fbo.gl();
+    if(gl && _tex)
+    {
+        gl->attach(*_tex, static_cast<GlFrameBuffer::Attachment>(pos));
+    }
+    else
+    {
+        LOG(ERROR) << "Texture could not be attached";
+    }
 }
 
 QString Texture2D::source() const

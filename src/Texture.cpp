@@ -21,6 +21,8 @@ int Texture::channels() const
 
 void Texture::setChannels(int channels)
 {
+    if(_type == Depth16 || _type == Depth24 || _type == Depth32 || _type == Depth32F)
+        return;
     _channels = glm::clamp(channels, 1, 4);
 }
 
@@ -42,6 +44,13 @@ int Texture::typeSize(Texture::Type type)
         return 2;
     case Float:
         return 4;
+    case Depth16:
+        return 2;
+    case Depth24:
+        return 3;
+    case Depth32:
+    case Depth32F:
+        return 4;
     }
     return 0;
 }
@@ -49,4 +58,6 @@ int Texture::typeSize(Texture::Type type)
 void Texture::setType(const Type& type)
 {
     _type = type;
+    if(_type == Depth16 || _type == Depth24 || _type == Depth32 || _type == Depth32F)
+        _channels = 1;
 }

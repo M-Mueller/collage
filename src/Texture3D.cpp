@@ -6,6 +6,7 @@
 #include <QtCore/QTextStream>
 
 #include <grogl/GlTexture3D.h>
+#include <grogl/GlFrameBuffer.h>
 
 #include <cassert>
 
@@ -52,7 +53,11 @@ void Texture3D::synchronize()
         {{1, Type::Float}, GlTexture::InternalFormat::R32F},
         {{2, Type::Float}, GlTexture::InternalFormat::RG32F},
         {{3, Type::Float}, GlTexture::InternalFormat::RGB32F},
-        {{4, Type::Float}, GlTexture::InternalFormat::RGBA32F}
+        {{4, Type::Float}, GlTexture::InternalFormat::RGBA32F},
+        {{1, Type::Depth16}, GlTexture::InternalFormat::DepthComponent16},
+        {{1, Type::Depth24}, GlTexture::InternalFormat::DepthComponent24},
+        {{1, Type::Depth32}, GlTexture::InternalFormat::DepthComponent32},
+        {{1, Type::Depth32F}, GlTexture::InternalFormat::DepthComponent32F}
     };
 
     std::map<Type, GlTexture::PixelType> mapToPixelType =
@@ -113,6 +118,20 @@ GlTexture3D* Texture3D::gl()
     return _tex;
 }
 
+void Texture3D::attachTo(Framebuffer& /*fbo*/, Framebuffer::Attachment /*pos*/)
+{
+    assert(false);
+//    GlFrameBuffer* gl = fbo.gl();
+//    if(gl && _tex)
+//    {
+//        gl->attach(*_tex, static_cast<GlFrameBuffer::Attachment>(pos));
+//    }
+//    else
+//    {
+//        LOG(ERROR) << "Texture could not be attached";
+//    }
+}
+
 int Texture3D::width() const
 {
     return _width;
@@ -120,6 +139,8 @@ int Texture3D::width() const
 
 void Texture3D::setWidth(int width)
 {
+    if(width < 0)
+        width = 0;
     _width = width;
 }
 
@@ -130,6 +151,8 @@ int Texture3D::height() const
 
 void Texture3D::setHeight(int height)
 {
+    if(height < 0)
+        height = 0;
     _height = height;
 }
 
@@ -139,6 +162,8 @@ int Texture3D::depth() const
 }
 void Texture3D::setDepth(int depth)
 {
+    if(depth < 0)
+        depth = 0;
     _depth = depth;
 }
 

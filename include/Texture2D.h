@@ -30,6 +30,8 @@ public:
 
     GlTexture2D* gl();
 
+    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos);
+
 public slots:
     void setHeight(int height);
     void setWidth(int width);
