@@ -76,10 +76,10 @@ void Cube::synchronize()
             _vao->bind();
 
             _vbo->bind();
-            _vbo->setData(GlBuffer::StaticDraw, vertices, colors);
+            _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, colors);
 
             _ibo->bind(); // vao unbinds element_array_buffer
-            _ibo->setData(GlBuffer::StaticDraw, indices);
+            _ibo->setData(GlBuffer::Usage::StaticDraw, indices);
 
             _vao->setVertexData(*_vbo);
             _vao->setIndexBuffer(*_ibo);
@@ -120,7 +120,7 @@ void Cube::render(GlProgram& /*program*/)
     if(_vao)
     {
         _vao->bind();
-        _vao->drawElements(GlVertexArray::Triangles);
+        _vao->drawElements(GlVertexArray::Primitive::Triangles);
         _vao->release();
     }
 }

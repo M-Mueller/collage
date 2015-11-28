@@ -72,22 +72,30 @@ void Texture2D::synchronize()
 {
     std::map<std::pair<int, Type>, GlTexture::InternalFormat> mapToFormat =
     {
-        {{1, Type::Char}, GlTexture::R8},
-        {{2, Type::Char}, GlTexture::RG8},
-        {{3, Type::Char}, GlTexture::RGB8},
-        {{4, Type::Char}, GlTexture::RGBA8},
-        {{1, Type::Short}, GlTexture::R16},
-        {{2, Type::Short}, GlTexture::RG16},
-        {{3, Type::Short}, GlTexture::RGB16},
-        {{4, Type::Short}, GlTexture::RGBA16},
-        {{1, Type::HalfFloat}, GlTexture::R16F},
-        {{2, Type::HalfFloat}, GlTexture::RG16F},
-        {{3, Type::HalfFloat}, GlTexture::RGB16F},
-        {{4, Type::HalfFloat}, GlTexture::RGBA16F},
-        {{1, Type::Float}, GlTexture::R32F},
-        {{2, Type::Float}, GlTexture::RG32F},
-        {{3, Type::Float}, GlTexture::RGB32F},
-        {{4, Type::Float}, GlTexture::RGBA32F}
+        {{1, Type::Char}, GlTexture::InternalFormat::R8},
+        {{2, Type::Char}, GlTexture::InternalFormat::RG8},
+        {{3, Type::Char}, GlTexture::InternalFormat::RGB8},
+        {{4, Type::Char}, GlTexture::InternalFormat::RGBA8},
+        {{1, Type::UnsignedChar}, GlTexture::InternalFormat::R8},
+        {{2, Type::UnsignedChar}, GlTexture::InternalFormat::RG8},
+        {{3, Type::UnsignedChar}, GlTexture::InternalFormat::RGB8},
+        {{4, Type::UnsignedChar}, GlTexture::InternalFormat::RGBA8},
+        {{1, Type::Short}, GlTexture::InternalFormat::R16},
+        {{2, Type::Short}, GlTexture::InternalFormat::RG16},
+        {{3, Type::Short}, GlTexture::InternalFormat::RGB16},
+        {{4, Type::Short}, GlTexture::InternalFormat::RGBA16},
+        {{1, Type::UnsignedShort}, GlTexture::InternalFormat::R16},
+        {{2, Type::UnsignedShort}, GlTexture::InternalFormat::RG16},
+        {{3, Type::UnsignedShort}, GlTexture::InternalFormat::RGB16},
+        {{4, Type::UnsignedShort}, GlTexture::InternalFormat::RGBA16},
+        {{1, Type::HalfFloat}, GlTexture::InternalFormat::R16F},
+        {{2, Type::HalfFloat}, GlTexture::InternalFormat::RG16F},
+        {{3, Type::HalfFloat}, GlTexture::InternalFormat::RGB16F},
+        {{4, Type::HalfFloat}, GlTexture::InternalFormat::RGBA16F},
+        {{1, Type::Float}, GlTexture::InternalFormat::R32F},
+        {{2, Type::Float}, GlTexture::InternalFormat::RG32F},
+        {{3, Type::Float}, GlTexture::InternalFormat::RGB32F},
+        {{4, Type::Float}, GlTexture::InternalFormat::RGBA32F}
     };
 
 
@@ -180,7 +188,7 @@ void Texture2D::setSource(const QString& source)
     if(!img.isNull())
     {
         // if a valid image is set, the type and number of channels will be read only
-        _type = Type::Char;
+        _type = Type::UnsignedChar;
         _width = img.width();
         _height = img.height();
         if(_sourceImage.hasAlphaChannel())

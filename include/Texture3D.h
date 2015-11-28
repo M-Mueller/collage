@@ -2,8 +2,9 @@
 #define TEXTURE3D_H
 
 #include "Texture.h"
-#include <QtCore/QObject>
+#include <QtGui/QVector3D>
 #include <QtGui/QImage>
+#include <QtCore/QObject>
 
 class GlTexture3D;
 class Texture3D: public Texture
@@ -41,13 +42,19 @@ public slots:
     void setSource(const QString& source);
 
 private:
+    bool loadMHD(const QString& header);
+
+private:
     int _width;
     int _height;
     int _depth;
 
+    QVector3D _spacing;
+
     GlTexture3D* _tex;
 
     QString _source;
+    QByteArray _data;
 };
 
 #endif // TEXTURE3D_H

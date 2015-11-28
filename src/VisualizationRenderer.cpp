@@ -7,8 +7,10 @@
 #include <glad/glad.h>
 
 #include <QtGui/QOpenGLFramebufferObject>
+#include <QtQuick/QQuickWindow>
 
-VisualizationRenderer::VisualizationRenderer()
+VisualizationRenderer::VisualizationRenderer():
+    m_item(nullptr)
 {
     static bool init = false;
     if(!init)
@@ -37,6 +39,7 @@ void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
             element->synchronize();
         }
     }
+    m_item = item;
 }
 
 void VisualizationRenderer::render()
@@ -48,5 +51,7 @@ void VisualizationRenderer::render()
     {
         pass->render();
     }
+    if(m_item)
+        m_item->window()->resetOpenGLState();
 }
 

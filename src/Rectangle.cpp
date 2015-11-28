@@ -44,11 +44,11 @@ void Rectangle::synchronize()
 
         _vbo = new GlVertexBuffer;
         _vbo->bind();
-        _vbo->setData(GlBuffer::StaticDraw, vertices, texCoords);
+        _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, texCoords);
 
         _ibo = new GlIndexBuffer;
         _ibo->bind();
-        _ibo->setData(GlBuffer::StaticDraw, indices);
+        _ibo->setData(GlBuffer::Usage::StaticDraw, indices);
 
         _vao = new GlVertexArray;
         _vao->bind();
@@ -74,7 +74,7 @@ void Rectangle::render(GlProgram& program)
         program.setUniform("tex", 0);
     }
     _vao->bind();
-    _vao->drawElements(GlVertexArray::Triangles);
+    _vao->drawElements(GlVertexArray::Primitive::Triangles);
     _vao->release();
     if(_tex)
     {

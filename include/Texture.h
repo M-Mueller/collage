@@ -13,7 +13,9 @@ public:
     enum Type
     {
         Char,
+        UnsignedChar,
         Short,
+        UnsignedShort,
         HalfFloat,
         Float
     };
@@ -24,6 +26,9 @@ public:
 
     virtual int channels() const;
     virtual Type type() const;
+
+    /// Returns the size of the Type in byte
+    static int typeSize(Type type);
 
 public slots:
     virtual void setChannels(int channels);

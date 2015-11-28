@@ -5,6 +5,7 @@
 #include <QFile>
 #include <grogl/GlProgram.h>
 #include <grogl/GlFrameBuffer.h>
+#include <glad/glad.h>
 
 RenderPass::RenderPass():
     _program(nullptr),

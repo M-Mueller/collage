@@ -29,6 +29,23 @@ Texture::Type Texture::type() const
     return _type;
 }
 
+int Texture::typeSize(Texture::Type type)
+{
+    switch (type) {
+    case Char:
+    case UnsignedChar:
+        return 1;
+    case Short:
+    case UnsignedShort:
+        return 2;
+    case HalfFloat:
+        return 2;
+    case Float:
+        return 4;
+    }
+    return 0;
+}
+
 void Texture::setType(const Type& type)
 {
     _type = type;

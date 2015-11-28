@@ -16,6 +16,7 @@ public:
 
 private:
     QList<RenderPass*> m_passes;
+    QQuickFramebufferObject* m_item;
 };
 
 #endif // VISUALIZATIONRENDERER_H
