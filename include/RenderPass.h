@@ -3,6 +3,7 @@
 
 #include "RendererElement.h"
 #include <QtCore/QObject>
+#include <QtCore/QRect>
 #include <QtQml/QQmlListProperty>
 
 class Entity;
@@ -18,9 +19,10 @@ class RenderPass: public QObject, public RendererElement
     Q_PROPERTY(Camera* camera READ camera WRITE setCamera)
     Q_PROPERTY(QQmlListProperty<Entity> entities READ entities)
     Q_PROPERTY(Framebuffer* renderToTexture READ renderToTexture WRITE setRenderToTexture)
+    Q_PROPERTY(QRect viewport READ viewport WRITE setViewport)
     Q_CLASSINFO("DefaultProperty", "entities")
 public:
-    RenderPass();
+    RenderPass(QObject* parent=0);
     virtual ~RenderPass();
 
     QString vertexShaderPath() const;
@@ -33,6 +35,7 @@ public:
     QQmlListProperty<Entity> entities();
     Camera* camera() const;
     Framebuffer* renderToTexture() const;
+    QRect viewport() const;
 
 public slots:
     void setVertexShaderPath(const QString& vertexShaderPath);
@@ -40,6 +43,7 @@ public slots:
     void setFragmentShaderPath(const QString& fragmentShaderPath);
     void setCamera(Camera* camera);
     void setRenderToTexture(Framebuffer* renderToTexture);
+    void setViewport(const QRect& viewport);
 
 private:
     static void appendEntity(QQmlListProperty<Entity>* list, Entity* value);
@@ -56,6 +60,10 @@ private:
     Camera* _camera;
     QList<Entity*> _entities;
     Framebuffer* _renderToTexture;
+    QRect _viewport;
+
+    // members that can be used during render
+    QRect _r_viewport;
 };
 
 

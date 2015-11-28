@@ -7,10 +7,12 @@
 #include <grogl/GlFrameBuffer.h>
 #include <glad/glad.h>
 
-RenderPass::RenderPass():
+RenderPass::RenderPass(QObject* parent):
+    QObject(parent),
     _program(nullptr),
-    _camera(nullptr),
-    _renderToTexture(nullptr)
+    _camera(new Camera(this)),
+    _renderToTexture(nullptr),
+    _viewport(QRect())
 {
 
 }
@@ -80,6 +82,8 @@ void RenderPass::synchronize()
         }
     }
 
+    _r_viewport = _viewport;
+
     RendererElement::synchronize();
 }
 
@@ -95,9 +99,11 @@ void RenderPass::render()
 
         // bind framebuffer and set viewport to render to complete texture
         _renderToTexture->gl()->bind();
-        glViewport(0, 0, _renderToTexture->width(), _renderToTexture->height());
+        glViewport(_r_viewport.x(), _r_viewport.y(), _r_viewport.width(), _r_viewport.height());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    glEnable(GL_DEPTH_TEST);
     _program->activate();
     if(_camera)
     {
@@ -161,6 +167,16 @@ int RenderPass::entityCount(QQmlListProperty<Entity>* list)
     return 0;
 }
 
+QRect RenderPass::viewport() const
+{
+    return _viewport;
+}
+
+void RenderPass::setViewport(const QRect& viewport)
+{
+    _viewport = viewport;
+}
+
 Framebuffer* RenderPass::renderToTexture() const
 {
     return _renderToTexture;
@@ -178,5 +194,7 @@ Camera* RenderPass::camera() const
 
 void RenderPass::setCamera(Camera* camera)
 {
+    if(_camera->parent() == this)
+        _camera->deleteLater();
     _camera = camera;
 }
