@@ -18,6 +18,7 @@ set(SOURCES
     src/VisualizationRenderer.cpp
     src/RendererElement.cpp
     src/RenderPass.cpp
+    src/Uniform.cpp
     src/Texture.cpp
     src/Texture2D.cpp
     src/Texture3D.cpp
@@ -35,6 +36,7 @@ set(HEADERS
     include/VisualizationRenderer.h
     include/RendererElement.h
     include/RenderPass.h
+    include/Uniform.h
     include/Texture.h
     include/Texture2D.h
     include/Texture3D.h

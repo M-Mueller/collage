@@ -5,6 +5,7 @@
 
 #include "VisualizationFramebuffer.h"
 #include "RenderPass.h"
+#include "Uniform.h"
 #include "Texture.h"
 #include "Texture2D.h"
 #include "Texture3D.h"
@@ -24,13 +25,22 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
+    qmlRegisterUncreatableType<Uniform>("Uniform", 1, 0, "Uniform", "Uniform is abstract");
+    qmlRegisterType<UniformInt>("UniformInt", 1, 0, "UniformInt");
+    qmlRegisterType<UniformFloat>("UniformFloat", 1, 0, "UniformFloat");
+    qmlRegisterType<UniformSampler2D>("UniformSampler2D", 1, 0, "UniformSampler2D");
+    qmlRegisterType<UniformSampler3D>("UniformSampler3D", 1, 0, "UniformSampler3D");
+
     qmlRegisterUncreatableType<Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
     qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
     qmlRegisterType<Texture3D>("Texture3D", 1, 0, "Texture3D");
-    qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
+
     qmlRegisterType<Framebuffer>("Framebuffer", 1, 0, "Framebuffer");
     qmlRegisterType<RenderBuffer>("RenderBuffer", 1, 0, "RenderBuffer");
+
+    qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
     qmlRegisterType<TurnTableCamera>("TurnTableCamera", 1, 0, "TurnTableCamera");
+
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");

@@ -2,13 +2,20 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Framebuffer.h"
-#include <QFile>
+#include "Uniform.h"
+
+#include <QtCore/QFile>
+
 #include <grogl/GlProgram.h>
 #include <grogl/GlFrameBuffer.h>
+
 #include <glad/glad.h>
+
+#include "easylogging++.h"
 
 RenderPass::RenderPass(QObject* parent):
     QObject(parent),
+    _forceShaderReload(false),
     _program(nullptr),
     _camera(new Camera(this)),
     _renderToTexture(nullptr),
@@ -54,6 +61,13 @@ void RenderPass::setFragmentShaderPath(const QString& fragmentShaderPath)
 
 void RenderPass::synchronize()
 {
+    if(_forceShaderReload)
+    {
+        delete _program;
+        _program = nullptr;
+        _forceShaderReload = false;
+    }
+
     if(!_program)
     {
         QString vsSrc, gsSrc, fsSrc;
@@ -75,10 +89,21 @@ void RenderPass::synchronize()
 
         if(!vsSrc.isEmpty() && !fsSrc.isEmpty())
         {
-            if(gsSrc.isEmpty())
-                _program = new GlProgram(vsSrc.toStdString(), fsSrc.toStdString());
-            else
-                _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
+            try
+            {
+                if(gsSrc.isEmpty())
+                    _program = new GlProgram(vsSrc.toStdString(), fsSrc.toStdString());
+                else
+                    _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
+            }
+            catch(std::exception e)
+            {
+                LOG(ERROR) << "Failed to create program: " << e.what();
+            }
+        }
+        else
+        {
+            LOG(ERROR) << "Failed to load shader source";
         }
     }
 
@@ -89,6 +114,9 @@ void RenderPass::synchronize()
 
 void RenderPass::render()
 {
+    if(!_program)
+        return;
+
     GLint prevFBO;
     GLint prevViewport[4];
     if(_renderToTexture)
@@ -109,10 +137,22 @@ void RenderPass::render()
     {
         _camera->applyMatrices(*_program);
     }
+
+    for(auto uniform: _uniforms)
+    {
+        uniform->set(*_program);
+    }
+
     for(auto entity: _entities)
     {
         entity->render(*_program);
     }
+
+    for(auto uniform: _uniforms)
+    {
+        uniform->releaseResources();
+    }
+
     _program->deactivate();
 
     if(_renderToTexture)
@@ -121,6 +161,12 @@ void RenderPass::render()
         glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
         glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
     }
+}
+
+QQmlListProperty<Uniform> RenderPass::uniforms()
+{
+    return QQmlListProperty<Uniform>(this, 0, &RenderPass::appendUniform, &RenderPass::uniformCount,
+                                    &RenderPass::uniformAt, &RenderPass::clearUniform);
 }
 
 QQmlListProperty<Entity> RenderPass::entities()
@@ -175,6 +221,48 @@ QRect RenderPass::viewport() const
 void RenderPass::setViewport(const QRect& viewport)
 {
     _viewport = viewport;
+}
+
+void RenderPass::reloadShaders()
+{
+    _forceShaderReload = true;
+}
+
+void RenderPass::appendUniform(QQmlListProperty<Uniform>* list, Uniform* value)
+{
+    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    {
+        if(!pass->_uniforms.contains(value))
+        {
+            pass->_uniforms.append(value);
+        }
+    }
+}
+
+Uniform* RenderPass::uniformAt(QQmlListProperty<Uniform>* list, int index)
+{
+    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    {
+        return pass->_uniforms.value(index, nullptr);
+    }
+    return nullptr;
+}
+
+void RenderPass::clearUniform(QQmlListProperty<Uniform>* list)
+{
+    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    {
+        pass->_uniforms.clear();
+    }
+}
+
+int RenderPass::uniformCount(QQmlListProperty<Uniform>* list)
+{
+    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    {
+        return pass->_uniforms.count();
+    }
+    return 0;
 }
 
 Framebuffer* RenderPass::renderToTexture() const
