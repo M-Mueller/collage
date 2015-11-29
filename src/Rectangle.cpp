@@ -6,7 +6,6 @@
 
 Rectangle::Rectangle(QObject* parent):
     Entity(parent),
-    _tex(0),
     _vao(0),
     _vbo(0),
     _ibo(0)
@@ -59,36 +58,13 @@ void Rectangle::synchronize()
         _vbo->release();
         _ibo->release();
     }
-
-    if(_tex->parent() == this)
-    {
-        _tex->synchronize();
-    }
+    Entity::synchronize();
 }
 
-void Rectangle::render(GlProgram& program)
+void Rectangle::render(GlProgram& /*program*/)
 {
-    if(_tex)
-    {
-        _tex->gl()->bind(0);
-        program.setUniform("tex", 0);
-    }
     _vao->bind();
     _vao->drawElements(GlVertexArray::Primitive::Triangles);
     _vao->release();
-    if(_tex)
-    {
-        _tex->gl()->release();
-    }
-}
-
-Texture2D* Rectangle::texture() const
-{
-    return _tex;
-}
-
-void Rectangle::setTexture(Texture2D* tex)
-{
-    _tex = tex;
 }
 

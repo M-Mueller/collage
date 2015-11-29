@@ -256,7 +256,7 @@ bool Texture3D::loadMHD(const QString& header)
         }
         else if(token.startsWith("ElementType"))
         {
-            if(value == "MET_UCHAR")
+            if(value == "MET_CHAR")
                 type = Char;
             else if(value == "MET_UCHAR")
                 type = UnsignedChar;

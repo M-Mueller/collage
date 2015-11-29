@@ -2,8 +2,13 @@ import QtQuick 2.5 as QtQuick
 
 import visualizationframebuffer 1.0
 import RenderPass 1.0
+import UniformInt 1.0
+import UniformFloat 1.0
+import UniformSampler2D 1.0
+import UniformSampler3D 1.0
 import Texture 1.0
 import Texture2D 1.0
+import Texture3D 1.0
 import Camera 1.0
 import Framebuffer 1.0
 import RenderBuffer 1.0
@@ -15,6 +20,11 @@ VisualizationFramebuffer {
     id: vis
     anchors.fill: parent
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
+
+    function reloadShaders() {
+        backFacePass.reloadShaders()
+        raycastingPass.reloadShaders()
+    }
 
     QtQuick.MouseArea {
         anchors.fill: parent;
@@ -46,7 +56,13 @@ VisualizationFramebuffer {
         id: camera
     }
 
+    Texture3D {
+        id: volume
+        source: "/home/markus/Data/Bucky.mhd"
+    }
+
     RenderPass {
+        id: backFacePass
         vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
 
@@ -55,7 +71,7 @@ VisualizationFramebuffer {
 
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
-                id: proxyBackFaces
+                id: proxyBackFace
                 type: Texture2D.Char
                 width: vis.width
                 height: vis.height
@@ -69,17 +85,73 @@ VisualizationFramebuffer {
         }
 
         Cube {
+            cullMode: Cube.Front
         }
     }
 
     RenderPass {
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/Rectangle.fs"
+        id: frontFacePass
+        vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
+        fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
+
+        camera: camera
+        viewport: Qt.rect(0, 0, vis.width, vis.height)
+
+        renderToTexture: Framebuffer {
+            colorAttachment0: Texture2D {
+                id: proxyFrontFace
+                type: Texture2D.Char
+                width: vis.width
+                height: vis.height
+                channels: 4
+            }
+            depthAttachment: RenderBuffer {
+                type: Texture.Depth24
+                width: vis.width
+                height: vis.height
+            }
+        }
+
+        Cube {
+            cullMode: Cube.Back
+        }
+    }
+
+    RenderPass {
+        id: raycastingPass
+        vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
+        fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
 
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
+        uniforms: [
+            UniformSampler2D {
+                name: "backface"
+                value: proxyBackFace
+                unit: 0
+            },
+            UniformSampler2D {
+                name: "frontface"
+                value: proxyFrontFace
+                unit: 1
+            },
+            UniformSampler3D {
+                name: "volume"
+                value: volume
+                unit: 2
+            },
+            UniformFloat {
+                name: "iso"
+                value: 0.5
+            },
+            UniformFloat {
+                name: "step"
+                value: 0.001
+            }
+        ]
+
         Rectangle {
-            texture: proxyBackFaces
+
         }
     }
 }

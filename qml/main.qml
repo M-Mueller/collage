@@ -25,7 +25,23 @@ QtControls.ApplicationWindow {
     }
 
     VolumeRenderer {
+        id: volumeRenderer
+        x: 227
+        y: 0
+        width: 413
+        height: 480
 
+    }
+
+    QtControls.Button {
+        id: reloadShaders
+        x: 45
+        y: 46
+        text: qsTr("Button")
+
+        onClicked: {
+            volumeRenderer.reloadShaders()
+        }
     }
 }
 

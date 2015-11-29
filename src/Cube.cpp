@@ -2,12 +2,14 @@
 #include <grogl/GlVertexArray.h>
 #include <grogl/GlVertexBuffer.h>
 #include <grogl/GlIndexBuffer.h>
+#include <glad/glad.h>
 
 Cube::Cube(QObject* parent):
     Entity(parent),
     _vao(nullptr),
     _vbo(nullptr),
-    _ibo(nullptr)
+    _ibo(nullptr),
+    _cullMode(None)
 {
 
 }
@@ -113,15 +115,40 @@ void Cube::synchronize()
             }
         }
     }
+    _r_cullMode = _cullMode;
 }
 
 void Cube::render(GlProgram& /*program*/)
 {
+    if(_r_cullMode != None)
+    {
+        glEnable(GL_CULL_FACE);
+        if(_r_cullMode == Front)
+            glCullFace(GL_FRONT);
+        else
+            glCullFace(GL_BACK);
+    }
+
     if(_vao)
     {
         _vao->bind();
         _vao->drawElements(GlVertexArray::Primitive::Triangles);
         _vao->release();
     }
+
+    if(_r_cullMode != None)
+    {
+        glDisable(GL_CULL_FACE);
+    }
+}
+
+Cube::CullMode Cube::cullMode() const
+{
+    return _cullMode;
+}
+
+void Cube::setCullMode(const CullMode& cullMode)
+{
+    _cullMode = cullMode;
 }
 
