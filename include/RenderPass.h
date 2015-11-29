@@ -2,9 +2,13 @@
 #define RENDERPASS_H
 
 #include "RendererElement.h"
+
+#include <QtQml/QQmlListProperty>
+#include <QtGui/QColor>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
-#include <QtQml/QQmlListProperty>
+
+#include <glm/glm.hpp>
 
 class Entity;
 class Camera;
@@ -20,6 +24,11 @@ class RenderPass: public QObject, public RendererElement
     Q_PROPERTY(Camera* camera READ camera WRITE setCamera)
     Q_PROPERTY(Framebuffer* renderToTexture READ renderToTexture WRITE setRenderToTexture)
     Q_PROPERTY(QRect viewport READ viewport WRITE setViewport)
+    Q_PROPERTY(bool depthTest READ depthTest WRITE setDepthTest)
+    Q_PROPERTY(bool clearColorBuffer READ clearColorBuffer WRITE setClearColorBuffer)
+    Q_PROPERTY(bool clearDepthBuffer READ clearDepthBuffer WRITE setClearDepthBuffer)
+    Q_PROPERTY(QColor clearColor READ clearColor WRITE setClearColor)
+    Q_PROPERTY(float clearDepth READ clearDepth WRITE setClearDepth)
     Q_PROPERTY(QQmlListProperty<Uniform> uniforms READ uniforms)
     Q_PROPERTY(QQmlListProperty<Entity> entities READ entities)
     Q_CLASSINFO("DefaultProperty", "entities")
@@ -40,13 +49,29 @@ public:
     Framebuffer* renderToTexture() const;
     QRect viewport() const;
 
+    bool depthTest() const;
+
+    bool clearColorBuffer() const;
+    bool clearDepthBuffer() const;
+    QColor clearColor() const;
+    float clearDepth() const;
+
 public slots:
     void setVertexShaderPath(const QString& vertexShaderPath);
     void setGeometryShaderPath(const QString& geometryShaderPath);
     void setFragmentShaderPath(const QString& fragmentShaderPath);
+
     void setCamera(Camera* camera);
+
     void setRenderToTexture(Framebuffer* renderToTexture);
     void setViewport(const QRect& viewport);
+
+    void setDepthTest(bool depthTest);
+
+    void setClearColorBuffer(bool clearColorBuffer);
+    void setClearDepthBuffer(bool clearDepthBuffer);
+    void setClearColor(const QColor& clearColor);
+    void setClearDepth(float clearDepth);
 
     Q_INVOKABLE void reloadShaders();
 
@@ -66,16 +91,31 @@ private:
     QString _geometryShaderPath;
     QString _fragmentShaderPath;
     bool _forceShaderReload;
-
     GlProgram* _program;
+
     Camera* _camera;
+
     QList<Uniform*> _uniforms;
     QList<Entity*> _entities;
+
     Framebuffer* _renderToTexture;
     QRect _viewport;
 
+    bool _depthTest;
+
+    bool _clearColorBuffer;
+    bool _clearDepthBuffer;
+    QColor _clearColor;
+    float _clearDepth;
+
     // members that can be used during render
     QRect _r_viewport;
+    bool _r_depthTest;
+    bool _r_clearColorBuffer;
+    bool _r_clearDepthBuffer;
+    glm::vec4 _r_clearColor;
+    float _r_clearDepth;
+
 };
 
 

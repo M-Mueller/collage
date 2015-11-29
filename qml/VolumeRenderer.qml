@@ -69,6 +69,11 @@ VisualizationFramebuffer {
         camera: camera
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
+        depthTest: true
+
+        clearColorBuffer: true
+        clearDepthBuffer: true
+
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
                 id: proxyBackFace
@@ -96,6 +101,11 @@ VisualizationFramebuffer {
 
         camera: camera
         viewport: Qt.rect(0, 0, vis.width, vis.height)
+
+        depthTest: true
+
+        clearColorBuffer: true
+        clearDepthBuffer: true
 
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
