@@ -15,6 +15,7 @@
 #include "TurnTableCamera.h"
 #include "Entity.h"
 #include "Rectangle.h"
+#include "NearClippingRectangle.h"
 #include "Cube.h"
 
 INITIALIZE_EASYLOGGINGPP
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<Uniform>("Uniform", 1, 0, "Uniform", "Uniform is abstract");
     qmlRegisterType<UniformInt>("UniformInt", 1, 0, "UniformInt");
     qmlRegisterType<UniformFloat>("UniformFloat", 1, 0, "UniformFloat");
+    qmlRegisterType<UniformVec3>("UniformVec3", 1, 0, "UniformVec3");
     qmlRegisterType<UniformSampler2D>("UniformSampler2D", 1, 0, "UniformSampler2D");
     qmlRegisterType<UniformSampler3D>("UniformSampler3D", 1, 0, "UniformSampler3D");
 
@@ -43,6 +45,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
+    qmlRegisterType<NearClippingRectangle>("NearClippingRectangle", 1, 0, "NearClippingRectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
 
     QQmlApplicationEngine engine;

@@ -28,6 +28,7 @@ set(SOURCES
     src/TurnTableCamera.cpp
     src/Entity.cpp
     src/Rectangle.cpp
+    src/NearClippingRectangle.cpp
     src/Cube.cpp
 )
 
@@ -46,6 +47,7 @@ set(HEADERS
     include/TurnTableCamera.h
     include/Entity.h
     include/Rectangle.h
+    include/NearClippingRectangle.h
     include/Cube.h
 )
 

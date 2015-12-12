@@ -3,13 +3,13 @@
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec2 texCoord;
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec4 in_color;
 
-out vec2 fs_texCoord;
+out vec3 fs_rayExit;
 
 void main()
 {
-	fs_texCoord = texCoord;
-	gl_Position = projectionMatrix * viewMatrix * vec4(position, 0.0, 1.0);
+	fs_rayExit = in_color.rgb;
+	gl_Position = projectionMatrix * viewMatrix * vec4(in_position, 1.0);
 }

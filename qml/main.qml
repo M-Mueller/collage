@@ -41,6 +41,7 @@ QtControls.ApplicationWindow {
 
         onClicked: {
             volumeRenderer.reloadShaders()
+            volumeRenderer.update()
         }
     }
 }

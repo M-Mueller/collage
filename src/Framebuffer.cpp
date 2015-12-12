@@ -5,6 +5,7 @@
 Framebuffer::Framebuffer():
     _color0(nullptr),
     _color1(nullptr),
+    _depth(nullptr),
     _fbo(nullptr)
 {
 

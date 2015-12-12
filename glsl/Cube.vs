@@ -3,8 +3,8 @@
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
-in vec3 in_position;
-in vec4 in_color;
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec4 in_color;
 
 out vec4 fs_color;
 

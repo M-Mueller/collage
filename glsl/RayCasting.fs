@@ -1,12 +1,13 @@
 #version 330
 
-uniform sampler2D backface;
 uniform sampler2D frontface;
 uniform sampler3D volume;
+uniform int width;
+uniform int height;
 uniform float iso;
 uniform float step;
 
-in vec2 fs_texCoord;
+in vec3 fs_rayExit;
 out vec4 out_color;
 
 vec3 computePhongShading(vec3 pos, vec3 normal)
@@ -33,17 +34,18 @@ vec3 computeNormal(vec3 pos)
 
 void main()
 {
-	vec3 rayEnter = texture(frontface, fs_texCoord).rgb;
-	vec3 rayExit = texture(backface, fs_texCoord).rgb;
+	vec3 rayEnter = texture(frontface, gl_FragCoord.xy/vec2(width, height)).rgb;
+	vec3 rayExit = fs_rayExit;
 
 	vec3 rayOrigin = rayEnter;
 	vec3 rayDirection = normalize(rayExit - rayEnter);
+	out_color = vec4(0.0);
 
 	for(int i=0; i<1000; ++i)
 	{
-		if(any(lessThan(rayOrigin, vec3(0.0))) || any(greaterThan(rayOrigin, vec3(1.0))))
+		// FIXME: because of floating point errors, the first step is sometimes skipped
+		if(i > 0 && (any(lessThan(rayOrigin, vec3(0.0))) || any(greaterThan(rayOrigin, vec3(1.0)))))
 		{
-			out_color = vec4(0.0);
 			break;
 		}
 

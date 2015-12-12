@@ -4,6 +4,7 @@ import visualizationframebuffer 1.0
 import RenderPass 1.0
 import UniformInt 1.0
 import UniformFloat 1.0
+import UniformVec3 1.0
 import UniformSampler2D 1.0
 import UniformSampler3D 1.0
 import Texture 1.0
@@ -14,6 +15,7 @@ import Framebuffer 1.0
 import RenderBuffer 1.0
 import TurnTableCamera 1.0
 import Rectangle 1.0
+import NearClippingRectangle 1.0
 import Cube 1.0
 
 VisualizationFramebuffer {
@@ -22,7 +24,7 @@ VisualizationFramebuffer {
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
 
     function reloadShaders() {
-        backFacePass.reloadShaders()
+        frontFacePass.reloadShaders()
         raycastingPass.reloadShaders()
     }
 
@@ -46,7 +48,7 @@ VisualizationFramebuffer {
         }
 
         onWheel: {
-            camera.radius -= wheel.angleDelta.y/100
+            camera.radius -= wheel.angleDelta.y/200
             wheel.accepted = true;
             vis.update()
         }
@@ -62,39 +64,6 @@ VisualizationFramebuffer {
     }
 
     RenderPass {
-        id: backFacePass
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
-
-        camera: camera
-        viewport: Qt.rect(0, 0, vis.width, vis.height)
-
-        depthTest: true
-
-        clearColorBuffer: true
-        clearDepthBuffer: true
-
-        renderToTexture: Framebuffer {
-            colorAttachment0: Texture2D {
-                id: proxyBackFace
-                type: Texture2D.Char
-                width: vis.width
-                height: vis.height
-                channels: 4
-            }
-            depthAttachment: RenderBuffer {
-                type: Texture.Depth24
-                width: vis.width
-                height: vis.height
-            }
-        }
-
-        Cube {
-            cullMode: Cube.Front
-        }
-    }
-
-    RenderPass {
         id: frontFacePass
         vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
@@ -104,13 +73,13 @@ VisualizationFramebuffer {
 
         depthTest: true
 
-        clearColorBuffer: true
+        clearColorBuffer: false
         clearDepthBuffer: true
 
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
                 id: proxyFrontFace
-                type: Texture2D.Char
+                type: Texture2D.Float
                 width: vis.width
                 height: vis.height
                 channels: 4
@@ -120,6 +89,10 @@ VisualizationFramebuffer {
                 width: vis.width
                 height: vis.height
             }
+        }
+
+        NearClippingRectangle {
+            camera: camera
         }
 
         Cube {
@@ -132,14 +105,15 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
 
+        camera: camera
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
+        depthTest: true
+
+        clearColorBuffer: false
+        clearDepthBuffer: true
+
         uniforms: [
-            UniformSampler2D {
-                name: "backface"
-                value: proxyBackFace
-                unit: 0
-            },
             UniformSampler2D {
                 name: "frontface"
                 value: proxyFrontFace
@@ -149,6 +123,14 @@ VisualizationFramebuffer {
                 name: "volume"
                 value: volume
                 unit: 2
+            },
+            UniformInt {
+                name: "width"
+                value: vis.width
+            },
+            UniformInt {
+                name: "height"
+                value: vis.height
             },
             UniformFloat {
                 name: "iso"
@@ -160,8 +142,8 @@ VisualizationFramebuffer {
             }
         ]
 
-        Rectangle {
-
+        Cube {
+            cullMode: Cube.Front
         }
     }
 }
