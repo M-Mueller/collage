@@ -40,31 +40,54 @@ void Uniform::setName(const QString& name)
 //-------------------------------------------
 //-------------------------------------------
 
-UniformInt::UniformInt(QObject* parent):
+template<typename T, typename U>
+U _uniformConvert(const T& from)
+{
+    return static_cast<U>(from);
+}
+
+template<>
+glm::vec3 _uniformConvert(const QVector3D& from)
+{
+    return glm::vec3(from.x(), from.y(), from.z());
+}
+
+template<typename T, typename U>
+UniformTyped<T, U>::UniformTyped(QObject* parent):
     Uniform(parent)
 {
 
 }
 
-int UniformInt::value() const
-{
-    return _value;
-}
-
-void UniformInt::synchronize()
+template<typename T, typename U>
+void UniformTyped<T, U>::synchronize()
 {
     Uniform::synchronize();
-    _r_value = _value;
+    _r_value = _uniformConvert<T,U>(_value);
 }
 
-void UniformInt::set(GlProgram& program)
+//TODO
+//template<typename T>
+//void UniformTyped<T, T>::synchronize()
+//{
+//    Uniform::synchronize();
+//    _r_value = _value;
+//}
+
+template<typename T, typename U>
+void UniformTyped<T, U>::set(GlProgram& program)
 {
     program.setUniform(_r_name, _r_value);
 }
 
-void UniformInt::setValue(int value)
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+
+UniformInt::UniformInt(QObject* parent):
+    UniformTyped(parent)
 {
-    _value = value;
+
 }
 
 //-------------------------------------------
@@ -72,30 +95,19 @@ void UniformInt::setValue(int value)
 //-------------------------------------------
 
 UniformFloat::UniformFloat(QObject* parent):
-    Uniform(parent)
+    UniformTyped(parent)
 {
 
 }
 
-float UniformFloat::value() const
-{
-    return _value;
-}
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
 
-void UniformFloat::synchronize()
+UniformVec3::UniformVec3(QObject* parent):
+    UniformTyped(parent)
 {
-    Uniform::synchronize();
-    _r_value = _value;
-}
 
-void UniformFloat::set(GlProgram& program)
-{
-    program.setUniform(_r_name, _r_value);
-}
-
-void UniformFloat::setValue(float value)
-{
-    _value = value;
 }
 
 //-------------------------------------------

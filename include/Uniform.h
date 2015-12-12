@@ -2,12 +2,18 @@
 #define UNIFORM_H
 
 #include "RendererElement.h"
+#include <QtGui/QVector3D>
 #include <QtCore/QObject>
+
+#include <glm/glm.hpp>
 
 class GlProgram;
 class Texture2D;
 class Texture3D;
 
+/**
+ * @brief The Uniform class represents a single Uniform in a GlProgram.
+ */
 class Uniform: public QObject, public RendererElement
 {
     Q_OBJECT
@@ -31,42 +37,57 @@ protected:
     std::string _r_name;
 };
 
-class UniformInt: public Uniform
+/**
+ * @brief The UniformTyped class is a convenient class to create Uniforms of certain types.
+ * The template type T is the type that is exposed and which lives in the main Qt thread.
+ * The optional template type U is the type of the internal copy of T that lives in the render thread.
+ */
+template<typename T, typename U=T>
+class UniformTyped: public Uniform
+{
+public:
+    UniformTyped(QObject* parent=0);
+
+    T value() const
+    {
+        return _value;
+    }
+
+    void setValue(T value)
+    {
+        _value = value;
+    }
+
+    virtual void synchronize() override;
+    virtual void set(GlProgram &program) override;
+
+protected:
+    T _value;
+    U _r_value;
+};
+
+class UniformInt: public UniformTyped<int>
 {
     Q_OBJECT
     Q_PROPERTY(int value READ value WRITE setValue)
 public:
     UniformInt(QObject* parent=0);
-
-    int value() const;
-    virtual void synchronize() override;
-    virtual void set(GlProgram &program) override;
-
-public slots:
-    void setValue(int value);
-
-private:
-    int _value;
-    int _r_value;
 };
 
-class UniformFloat: public Uniform
+class UniformFloat: public UniformTyped<float>
 {
     Q_OBJECT
     Q_PROPERTY(float value READ value WRITE setValue)
 public:
     UniformFloat(QObject* parent=0);
+};
 
-    float value() const;
-    virtual void synchronize() override;
-    virtual void set(GlProgram &program) override;
-
-public slots:
-    void setValue(float value);
-
-private:
-    float _value;
-    float _r_value;
+class UniformVec3: public UniformTyped<QVector3D, glm::vec3>
+{
+    Q_OBJECT
+    Q_PROPERTY(QVector3D value READ value WRITE setValue)
+public:
+    UniformVec3(QObject* parent=0);
 };
 
 class UniformSampler2D: public Uniform
