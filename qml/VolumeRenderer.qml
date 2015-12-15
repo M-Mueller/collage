@@ -21,10 +21,10 @@ import Cube 1.0
 VisualizationFramebuffer {
     id: vis
     anchors.fill: parent
-    transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1}
+    transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1} // flip the whole image
 
     function reloadShaders() {
-        frontFacePass.reloadShaders()
+        rayEntryPointsPass.reloadShaders()
         raycastingPass.reloadShaders()
     }
 
@@ -63,8 +63,9 @@ VisualizationFramebuffer {
         source: "/home/markus/Data/Bucky.mhd"
     }
 
+    // Determine the entry points of the rays by drawing a cube that has its coordinates a colors
     RenderPass {
-        id: frontFacePass
+        id: rayEntryPointsPass
         vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
 
@@ -73,12 +74,12 @@ VisualizationFramebuffer {
 
         depthTest: true
 
-        clearColorBuffer: false
+        clearColorBuffer: true
         clearDepthBuffer: true
 
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
-                id: proxyFrontFace
+                id: rayEntryTex
                 type: Texture2D.Float
                 width: vis.width
                 height: vis.height
@@ -91,10 +92,12 @@ VisualizationFramebuffer {
             }
         }
 
+        // first render the nearclipping plane as fallback position if the camera is inside the cube
         NearClippingRectangle {
             camera: camera
         }
 
+        // render the frontfaces of the cube
         Cube {
             cullMode: Cube.Back
         }
@@ -110,13 +113,13 @@ VisualizationFramebuffer {
 
         depthTest: true
 
-        clearColorBuffer: false
+        clearColorBuffer: false // already cleared by qt
         clearDepthBuffer: true
 
         uniforms: [
             UniformSampler2D {
-                name: "frontface"
-                value: proxyFrontFace
+                name: "rayEntryTex"
+                value: rayEntryTex
                 unit: 1
             },
             UniformSampler3D {
@@ -124,24 +127,22 @@ VisualizationFramebuffer {
                 value: volume
                 unit: 2
             },
-            UniformInt {
-                name: "width"
-                value: vis.width
+            UniformFloat {
+                name: "step"
+                value: 0.001
             },
             UniformInt {
-                name: "height"
-                value: vis.height
+                id: mode
+                name: "mode"
+                value: 0
             },
             UniformFloat {
                 name: "iso"
                 value: 0.5
-            },
-            UniformFloat {
-                name: "step"
-                value: 0.001
             }
         ]
 
+        // render only the backfaces of the cube as exit positions for the rays
         Cube {
             cullMode: Cube.Front
         }
