@@ -36,6 +36,7 @@ set(HEADERS
     include/VisualizationFramebuffer.h
     include/VisualizationRenderer.h
     include/RendererElement.h
+    include/RendererProperty.h
     include/RenderPass.h
     include/Uniform.h
     include/Texture.h

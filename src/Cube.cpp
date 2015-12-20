@@ -117,22 +117,22 @@ void Cube::synchronize()
             }
         }
     }
-    _r_cullMode = _cullMode;
-    _r_modelMatrix = glm::make_mat4(_modelMatrix.constData());
+    _cullMode.synchronize();
+    _modelMatrix.synchronize();
 }
 
 void Cube::render(GlProgram& program)
 {
-    if(_r_cullMode != None)
+    if(_cullMode.gl() != None)
     {
         glEnable(GL_CULL_FACE);
-        if(_r_cullMode == Front)
+        if(_cullMode.gl() == Front)
             glCullFace(GL_FRONT);
         else
             glCullFace(GL_BACK);
     }
 
-    program.setUniform("modelMatrix", _r_modelMatrix);
+    program.setUniform("modelMatrix", _modelMatrix.gl());
 
     if(_vao)
     {
@@ -141,7 +141,7 @@ void Cube::render(GlProgram& program)
         _vao->release();
     }
 
-    if(_r_cullMode != None)
+    if(_cullMode.gl() != None)
     {
         glDisable(GL_CULL_FACE);
     }
@@ -164,7 +164,7 @@ QMatrix4x4 Cube::modelMatrix() const
 
 QVector3D Cube::worldToVoxel(const QVector3D& world) const
 {
-    QMatrix4x4 inverted = _modelMatrix.inverted();
+    QMatrix4x4 inverted = _modelMatrix.value.inverted();
     return (inverted * world + QVector3D(1, 1, 1))/2;
 }
 

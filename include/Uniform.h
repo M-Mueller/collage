@@ -2,6 +2,7 @@
 #define UNIFORM_H
 
 #include "RendererElement.h"
+#include "RendererProperty.h"
 #include <QtGui/QVector3D>
 #include <QtCore/QObject>
 
@@ -33,8 +34,7 @@ public slots:
     void setName(const QString& name);
 
 protected:
-    QString _name;
-    std::string _r_name;
+    RendererProperty<QString, std::string> _name;
 };
 
 /**
@@ -62,8 +62,7 @@ public:
     virtual void set(GlProgram &program) override;
 
 protected:
-    T _value;
-    U _r_value;
+    RendererProperty<T, U> _value;
 };
 
 class UniformInt: public UniformTyped<int>
@@ -111,8 +110,7 @@ public slots:
 
 private:
     Texture2D* _value;
-    int _unit;
-    int _r_unit;
+    RendererProperty<int> _unit;
 };
 
 class UniformSampler3D: public Uniform
@@ -136,8 +134,7 @@ public slots:
 
 private:
     Texture3D* _value;
-    int _unit;
-    int _r_unit;
+    RendererProperty<int> _unit;
 };
 
 #endif // UNIFORM_H

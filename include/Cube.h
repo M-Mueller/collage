@@ -2,6 +2,7 @@
 #define CUBE_H
 
 #include "Entity.h"
+#include "RendererProperty.h"
 #include <QtGui/QMatrix4x4>
 
 class GlVertexArray;
@@ -42,11 +43,8 @@ private:
     GlVertexBuffer* _vbo;
     GlIndexBuffer* _ibo;
 
-    CullMode _cullMode;
-    CullMode _r_cullMode;
-
-    QMatrix4x4 _modelMatrix;
-    glm::mat4 _r_modelMatrix;
+    RendererProperty<CullMode> _cullMode;
+    RendererProperty<QMatrix4x4, glm::mat4> _modelMatrix;
 };
 
 #endif // CUBE_H

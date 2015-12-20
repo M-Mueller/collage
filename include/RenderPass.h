@@ -2,6 +2,7 @@
 #define RENDERPASS_H
 
 #include "RendererElement.h"
+#include "RendererProperty.h"
 
 #include <QtQml/QQmlListProperty>
 #include <QtGui/QColor>
@@ -99,22 +100,13 @@ private:
     QList<Entity*> _entities;
 
     Framebuffer* _renderToTexture;
-    QRect _viewport;
 
-    bool _depthTest;
-
-    bool _clearColorBuffer;
-    bool _clearDepthBuffer;
-    QColor _clearColor;
-    float _clearDepth;
-
-    // members that can be used during render
-    QRect _r_viewport;
-    bool _r_depthTest;
-    bool _r_clearColorBuffer;
-    bool _r_clearDepthBuffer;
-    glm::vec4 _r_clearColor;
-    float _r_clearDepth;
+    RendererProperty<QRect> _viewport;
+    RendererProperty<bool> _depthTest;
+    RendererProperty<bool> _clearColorBuffer;
+    RendererProperty<bool> _clearDepthBuffer;
+    RendererProperty<QColor, glm::vec4> _clearColor;
+    RendererProperty<float> _clearDepth;
 
 };
 

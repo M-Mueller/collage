@@ -19,15 +19,15 @@ QMatrix4x4 Camera::projectionMatrix() const
 
 void Camera::synchronize()
 {
-    _r_viewMatrix = glm::make_mat4(_viewMatrix.constData());
-    _r_projectionMatrix = glm::make_mat4(_projectionMatrix.constData());
+    _viewMatrix.synchronize();
+    _projectionMatrix.synchronize();
     RendererElement::synchronize();
 }
 
 void Camera::applyMatrices(GlProgram& program)
 {
-    program.setUniform("viewMatrix", _r_viewMatrix);
-    program.setUniform("projectionMatrix", _r_projectionMatrix);
+    program.setUniform("viewMatrix", _viewMatrix.gl());
+    program.setUniform("projectionMatrix", _projectionMatrix.gl());
 }
 
 void Camera::setViewMatrix(const QMatrix4x4& viewMatrix)

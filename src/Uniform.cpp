@@ -23,7 +23,7 @@ QString Uniform::name() const
 
 void Uniform::synchronize()
 {
-    _r_name = _name.toStdString();
+    _name.synchronize();
 }
 
 void Uniform::releaseResources()
@@ -41,18 +41,6 @@ void Uniform::setName(const QString& name)
 //-------------------------------------------
 
 template<typename T, typename U>
-U _uniformConvert(const T& from)
-{
-    return static_cast<U>(from);
-}
-
-template<>
-glm::vec3 _uniformConvert(const QVector3D& from)
-{
-    return glm::vec3(from.x(), from.y(), from.z());
-}
-
-template<typename T, typename U>
 UniformTyped<T, U>::UniformTyped(QObject* parent):
     Uniform(parent)
 {
@@ -63,21 +51,13 @@ template<typename T, typename U>
 void UniformTyped<T, U>::synchronize()
 {
     Uniform::synchronize();
-    _r_value = _uniformConvert<T,U>(_value);
+    _value.synchronize();
 }
-
-//TODO
-//template<typename T>
-//void UniformTyped<T, T>::synchronize()
-//{
-//    Uniform::synchronize();
-//    _r_value = _value;
-//}
 
 template<typename T, typename U>
 void UniformTyped<T, U>::set(GlProgram& program)
 {
-    program.setUniform(_r_name, _r_value);
+    program.setUniform(_name.gl(), _value.gl());
 }
 
 //-------------------------------------------
@@ -128,13 +108,13 @@ Texture2D* UniformSampler2D::value() const
 void UniformSampler2D::synchronize()
 {
     Uniform::synchronize();
-    _r_unit = _unit;
+    _unit.synchronize();
 }
 
 void UniformSampler2D::set(GlProgram& program)
 {
-    _value->gl()->bind(_unit);
-    program.setUniform(_r_name, _unit);
+    _value->gl()->bind(_unit.gl());
+    program.setUniform(_name.gl(), _unit.gl());
 }
 
 void UniformSampler2D::releaseResources()
@@ -175,13 +155,13 @@ Texture3D* UniformSampler3D::value() const
 void UniformSampler3D::synchronize()
 {
     Uniform::synchronize();
-    _r_unit = _unit;
+    _unit.synchronize();
 }
 
 void UniformSampler3D::set(GlProgram& program)
 {
-    _value->gl()->bind(_unit);
-    program.setUniform(_r_name, _unit);
+    _value->gl()->bind(_unit.gl());
+    program.setUniform(_name.gl(), _unit.gl());
 }
 
 void UniformSampler3D::releaseResources()

@@ -2,6 +2,11 @@
 
 #include <QtCore/QObject>
 
+RendererElement::~RendererElement()
+{
+
+}
+
 void RendererElement::synchronize()
 {
     if(auto qobject = dynamic_cast<QObject*>(this))
@@ -15,4 +20,3 @@ void RendererElement::synchronize()
         }
     }
 }
-

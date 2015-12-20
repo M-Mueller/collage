@@ -10,6 +10,8 @@
 class RendererElement
 {
 public:
+    virtual ~RendererElement();
+
     /**
      * @brief Called during QQuickFramebufferObject::Renderer::synchronize with the OpenGL render context as current context.
      * Use this method to initialize/update all OpenGL related objects.

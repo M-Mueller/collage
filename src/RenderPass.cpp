@@ -111,12 +111,12 @@ void RenderPass::synchronize()
         }
     }
 
-    _r_viewport = _viewport;
-    _r_depthTest = _depthTest;
-    _r_clearColorBuffer = _clearColorBuffer;
-    _r_clearDepthBuffer = _clearDepthBuffer;
-    _r_clearColor = glm::vec4(_clearColor.redF(), _clearColor.greenF(), _clearColor.blueF(), _clearColor.alphaF());
-    _r_clearDepth = _clearDepth;
+    _viewport.synchronize();
+    _depthTest.synchronize();
+    _clearColorBuffer.synchronize();
+    _clearDepthBuffer.synchronize();
+    _clearColor.synchronize();
+    _clearDepth.synchronize();
 
     RendererElement::synchronize();
 }
@@ -136,19 +136,19 @@ void RenderPass::render()
 
         // bind framebuffer and set viewport to render to complete texture
         _renderToTexture->gl()->bind();
-        glViewport(_r_viewport.x(), _r_viewport.y(), _r_viewport.width(), _r_viewport.height());
+        glViewport(_viewport.gl().x(), _viewport.gl().y(), _viewport.gl().width(), _viewport.gl().height());
     }
 
-    glClearColor(_r_clearColor.r, _r_clearColor.g, _r_clearColor.b, _r_clearColor.a);
-    glClearDepth(_r_clearDepth);
-    if(_r_clearColorBuffer && _r_clearDepthBuffer)
+    glClearColor(_clearColor.gl().r, _clearColor.gl().g, _clearColor.gl().b, _clearColor.gl().a);
+    glClearDepth(_clearDepth.gl());
+    if(_clearColorBuffer.gl() && _clearDepthBuffer.gl())
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    else if(_r_clearColorBuffer)
+    else if(_clearColorBuffer.gl())
         glClear(GL_COLOR_BUFFER_BIT);
-    else if(_r_clearDepthBuffer)
+    else if(_clearDepthBuffer.gl())
         glClear(GL_DEPTH_BUFFER_BIT);
 
-    if(_r_depthTest)
+    if(_depthTest.gl())
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);

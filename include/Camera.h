@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "RendererElement.h"
+#include "RendererProperty.h"
 #include <QtCore/QObject>
 #include <QtGui/QMatrix4x4>
 #include <grogl/GlProgram.h>
@@ -30,11 +31,8 @@ signals:
     void projectionMatrixChanged(QMatrix4x4);
 
 protected:
-    QMatrix4x4 _viewMatrix;
-    QMatrix4x4 _projectionMatrix;
-
-    glm::mat4 _r_viewMatrix;
-    glm::mat4 _r_projectionMatrix;
+    RendererProperty<QMatrix4x4, glm::mat4> _viewMatrix;
+    RendererProperty<QMatrix4x4, glm::mat4> _projectionMatrix;
 };
 
 #endif // CAMERA_H
