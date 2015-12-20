@@ -1,4 +1,5 @@
 #include "NearClippingRectangle.h"
+#include "easylogging++.h"
 #include <glad/glad.h>
 
 NearClippingRectangle::NearClippingRectangle(QObject* parent):
@@ -9,22 +10,20 @@ NearClippingRectangle::NearClippingRectangle(QObject* parent):
 
 void NearClippingRectangle::synchronize()
 {
-    if(_camera)
+    if(_camera && _cube)
     {
         auto viewMatrixInv = _camera->viewMatrix().inverted();
         auto projectionMatrixInv = _camera->projectionMatrix().inverted();
 
-        setColor0(viewMatrixInv*projectionMatrixInv*QVector3D(-1, -1, -1));
-        setColor1(viewMatrixInv*projectionMatrixInv*QVector3D(1, -1, -1));
-        setColor2(viewMatrixInv*projectionMatrixInv*QVector3D(1, 1, -1));
-        setColor3(viewMatrixInv*projectionMatrixInv*QVector3D(-1, 1, -1));
-
-        // convert from world to voxel coordinates
-        //TODO: for now the volume is always centered and has unit size
-        setColor0(color0()/2 + QVector3D(1, 1, 1)/2);
-        setColor1(color1()/2 + QVector3D(1, 1, 1)/2);
-        setColor2(color2()/2 + QVector3D(1, 1, 1)/2);
-        setColor3(color3()/2 + QVector3D(1, 1, 1)/2);
+        // in normalized device coordinates, the near clipping plane is from (-1, -1, -1) to (1, 1, -1)
+        setColor0(_cube->worldToVoxel(viewMatrixInv*projectionMatrixInv*QVector3D(-1, -1, -1)));
+        setColor1(_cube->worldToVoxel(viewMatrixInv*projectionMatrixInv*QVector3D(1, -1, -1)));
+        setColor2(_cube->worldToVoxel(viewMatrixInv*projectionMatrixInv*QVector3D(1, 1, -1)));
+        setColor3(_cube->worldToVoxel(viewMatrixInv*projectionMatrixInv*QVector3D(-1, 1, -1)));
+    }
+    else
+    {
+        LOG(DEBUG) << "Cannot create NearClippingRectangle";
     }
 
     Rectangle::synchronize();
@@ -32,7 +31,7 @@ void NearClippingRectangle::synchronize()
 
 void NearClippingRectangle::render(GlProgram& program)
 {
-    if(_camera)
+    if(_camera && _cube)
     {
         glDepthMask(GL_FALSE);
 
@@ -53,4 +52,14 @@ Camera* NearClippingRectangle::camera() const
 void NearClippingRectangle::setCamera(Camera* camera)
 {
     _camera = camera;
+}
+
+Cube* NearClippingRectangle::cube() const
+{
+    return _cube;
+}
+
+void NearClippingRectangle::setCube(Cube* cube)
+{
+    _cube = cube;
 }

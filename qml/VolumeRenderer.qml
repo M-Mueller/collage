@@ -48,7 +48,7 @@ VisualizationFramebuffer {
         }
 
         onWheel: {
-            camera.radius -= wheel.angleDelta.y/200
+            camera.radius -= wheel.angleDelta.y/10
             wheel.accepted = true;
             vis.update()
         }
@@ -95,11 +95,17 @@ VisualizationFramebuffer {
         // first render the nearclipping plane as fallback position if the camera is inside the cube
         NearClippingRectangle {
             camera: camera
+            cube: volumeProxy
         }
 
         // render the frontfaces of the cube
         Cube {
+            id: volumeProxy
             cullMode: Cube.Back
+            modelMatrix: Qt.matrix4x4(volume.width*volume.spacing.x, 0, 0, 0,
+                                      0, volume.height*volume.spacing.y, 0, 0,
+                                      0, 0, volume.depth*volume.spacing.z, 0,
+                                      0, 0, 0, 1)
         }
     }
 
@@ -145,6 +151,7 @@ VisualizationFramebuffer {
         // render only the backfaces of the cube as exit positions for the rays
         Cube {
             cullMode: Cube.Front
+            modelMatrix: volumeProxy.modelMatrix
         }
     }
 }

@@ -228,6 +228,15 @@ bool Texture3D::loadMHD(const QString& header)
         return ok;
     };
 
+    auto readFloat = [](const QString& str, float& out)
+    {
+        bool ok;
+        out = str.toFloat(&ok);
+        if(!ok)
+            LOG(ERROR) << "Invalid MHD tag (not a double): " << str;
+        return ok;
+    };
+
     QTextStream stream(&file);
     while(!stream.atEnd())
     {
@@ -276,6 +285,14 @@ bool Texture3D::loadMHD(const QString& header)
         {
             rawPath = value;
         }
+        else if(token.startsWith("ElementSpacing"))
+        {
+            auto dims = value.split(' ');
+            if(!readFloat(dims.value(0, "1"), spacing[0])
+               || !readFloat(dims.value(1, "1"), spacing[1])
+               || !readFloat(dims.value(2, "1"), spacing[2]))
+                return false;
+        }
     }
 
     if(width <= 0)
@@ -322,5 +339,15 @@ bool Texture3D::loadMHD(const QString& header)
     _spacing = spacing;
     _data = data;
     return true;
+}
+
+QVector3D Texture3D::spacing() const
+{
+    return _spacing;
+}
+
+void Texture3D::setSpacing(const QVector3D& spacing)
+{
+    _spacing = spacing;
 }
 

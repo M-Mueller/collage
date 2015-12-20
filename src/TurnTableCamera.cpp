@@ -9,7 +9,7 @@ TurnTableCamera::TurnTableCamera(QObject* parent):
     _radius(4.0)
 {
     //TODO
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(65.0f), 640/(float)480, 1.0f, 100.f);
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 640/(float)480, 1.0f, 100.f);
     setProjectionMatrix(QMatrix4x4(glm::value_ptr(projectionMatrix)));
     updateViewMatrix();
 }

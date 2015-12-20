@@ -14,6 +14,7 @@ class Texture3D: public Texture
     Q_PROPERTY(int height READ height WRITE setHeight)
     Q_PROPERTY(int depth READ depth WRITE setDepth)
     Q_PROPERTY(QString source READ source WRITE setSource)
+    Q_PROPERTY(QVector3D spacing READ spacing WRITE setSpacing)
 
 public:
     Texture3D(QObject* parent=0);
@@ -34,12 +35,15 @@ public:
 
     virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos);
 
+    QVector3D spacing() const;
+
 public slots:
     void setHeight(int height);
     void setWidth(int width);
     void setDepth(int depth);
     void setChannels(int channels) override;
     void setType(const Type& type) override;
+    void setSpacing(const QVector3D& spacing);
 
     void setSource(const QString& source);
 
