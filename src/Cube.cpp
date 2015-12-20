@@ -3,13 +3,15 @@
 #include <grogl/GlVertexBuffer.h>
 #include <grogl/GlIndexBuffer.h>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(QObject* parent):
     Entity(parent),
     _vao(nullptr),
     _vbo(nullptr),
     _ibo(nullptr),
-    _cullMode(None)
+    _cullMode(None),
+    _modelMatrix()
 {
 
 }
@@ -116,9 +118,10 @@ void Cube::synchronize()
         }
     }
     _r_cullMode = _cullMode;
+    _r_modelMatrix = glm::make_mat4(_modelMatrix.constData());
 }
 
-void Cube::render(GlProgram& /*program*/)
+void Cube::render(GlProgram& program)
 {
     if(_r_cullMode != None)
     {
@@ -128,6 +131,8 @@ void Cube::render(GlProgram& /*program*/)
         else
             glCullFace(GL_BACK);
     }
+
+    program.setUniform("modelMatrix", _r_modelMatrix);
 
     if(_vao)
     {
@@ -150,5 +155,21 @@ Cube::CullMode Cube::cullMode() const
 void Cube::setCullMode(const CullMode& cullMode)
 {
     _cullMode = cullMode;
+}
+
+QMatrix4x4 Cube::modelMatrix() const
+{
+    return _modelMatrix;
+}
+
+QVector3D Cube::worldToVoxel(const QVector3D& world) const
+{
+    QMatrix4x4 inverted = _modelMatrix.inverted();
+    return (inverted * world + QVector3D(1, 1, 1))/2;
+}
+
+void Cube::setModelMatrix(const QMatrix4x4& modelMatrix)
+{
+    _modelMatrix = modelMatrix;
 }
 

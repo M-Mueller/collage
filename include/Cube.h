@@ -2,6 +2,7 @@
 #define CUBE_H
 
 #include "Entity.h"
+#include <QtGui/QMatrix4x4>
 
 class GlVertexArray;
 class GlVertexBuffer;
@@ -10,6 +11,7 @@ class Cube : public Entity
 {
     Q_OBJECT
     Q_PROPERTY(CullMode cullMode READ cullMode WRITE setCullMode)
+    Q_PROPERTY(QMatrix4x4 modelMatrix READ modelMatrix WRITE setModelMatrix)
 
 public:
     enum CullMode
@@ -27,9 +29,13 @@ public:
     void render(GlProgram& program) override;
 
     CullMode cullMode() const;
+    QMatrix4x4 modelMatrix() const;
+
+    QVector3D worldToVoxel(const QVector3D& world) const;
 
 public slots:
     void setCullMode(const CullMode& cullMode);
+    void setModelMatrix(const QMatrix4x4& modelMatrix);
 
 private:
     GlVertexArray* _vao;
@@ -38,6 +44,9 @@ private:
 
     CullMode _cullMode;
     CullMode _r_cullMode;
+
+    QMatrix4x4 _modelMatrix;
+    glm::mat4 _r_modelMatrix;
 };
 
 #endif // CUBE_H

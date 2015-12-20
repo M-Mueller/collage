@@ -1,5 +1,6 @@
 #version 330
 
+uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
@@ -11,5 +12,5 @@ out vec3 fs_rayExit;
 void main()
 {
 	fs_rayExit = in_color.rgb;
-	gl_Position = projectionMatrix * viewMatrix * vec4(in_position, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(in_position, 1.0);
 }
