@@ -30,6 +30,8 @@ QOpenGLFramebufferObject* VisualizationRenderer::createFramebufferObject(const Q
 
 void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
 {
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Renderer::synchronize");
+
     VisualizationFramebuffer* vfb = static_cast<VisualizationFramebuffer*>(item);
     m_passes = vfb->shaderPasses();
     for(auto child: vfb->children())
@@ -40,10 +42,14 @@ void VisualizationRenderer::synchronize(QQuickFramebufferObject* item)
         }
     }
     m_item = item;
+
+    glPopDebugGroup();
 }
 
 void VisualizationRenderer::render()
 {
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Renderer::render");
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -51,7 +57,10 @@ void VisualizationRenderer::render()
     {
         pass->render();
     }
+
+    glPopDebugGroup();
+
     if(m_item)
-        m_item->window()->resetOpenGLState();
+        m_item->window()->resetOpenGLState();    
 }
 
