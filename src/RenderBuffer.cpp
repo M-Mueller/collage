@@ -1,6 +1,6 @@
 #include "RenderBuffer.h"
-#include <grogl/GlFrameBuffer.h>
-#include <grogl/GlRenderBuffer.h>
+#include <glue/GlFrameBuffer.h>
+#include <glue/GlRenderBuffer.h>
 
 #include "easylogging++.h"
 

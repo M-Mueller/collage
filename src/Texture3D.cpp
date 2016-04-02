@@ -5,8 +5,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
-#include <grogl/GlTexture3D.h>
-#include <grogl/GlFrameBuffer.h>
+#include <glue/GlTexture3D.h>
+#include <glue/GlFrameBuffer.h>
 
 #include <cassert>
 

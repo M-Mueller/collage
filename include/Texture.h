@@ -10,6 +10,8 @@ class Texture: public QObject, public RendererElement
     Q_OBJECT
     Q_PROPERTY(Type type READ type WRITE setType)
     Q_PROPERTY(int channels READ channels WRITE setChannels)
+
+    friend class Framebuffer;
 public:
     enum Type
     {
@@ -35,11 +37,16 @@ public:
     /// Returns the size of the Type in byte
     static int typeSize(Type type);
 
-    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) =0;
-
 public slots:
     virtual void setChannels(int channels);
     virtual void setType(const Type& type);
+
+protected:
+    /**
+     * Attaches the texture to the FBO.
+     * This method should be used exclusively by the Framebuffer class.
+     */
+    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) =0;
 
 protected:
     Type _type;

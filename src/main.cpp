@@ -1,4 +1,4 @@
-#include <QtWidgets/QApplication>
+#include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 
 #include "easylogging++.h"
@@ -23,7 +23,7 @@ INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
     qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");

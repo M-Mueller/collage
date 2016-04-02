@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
 #include "Texture.h"
-#include <grogl/GlFrameBuffer.h>
+#include <glue/GlFrameBuffer.h>
 
 Framebuffer::Framebuffer():
     _color0(nullptr),

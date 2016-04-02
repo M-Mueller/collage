@@ -1,7 +1,7 @@
 #include "Cube.h"
-#include <grogl/GlVertexArray.h>
-#include <grogl/GlVertexBuffer.h>
-#include <grogl/GlIndexBuffer.h>
+#include <glue/GlVertexArray.h>
+#include <glue/GlVertexBuffer.h>
+#include <glue/GlIndexBuffer.h>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -77,17 +77,15 @@ void Cube::synchronize()
             _vbo = new GlVertexBuffer;
             _ibo = new GlIndexBuffer;
 
-            _vao->bind();
-
             _vbo->bind();
             _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, colors);
 
             _ibo->bind(); // vao unbinds element_array_buffer
             _ibo->setData(GlBuffer::Usage::StaticDraw, indices);
 
+            _vao->bind();
             _vao->setVertexData(*_vbo);
             _vao->setIndexBuffer(*_ibo);
-
             _vao->release();
 
             _vbo->release();

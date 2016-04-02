@@ -5,7 +5,7 @@
 #include "RendererProperty.h"
 #include <QtCore/QObject>
 #include <QtGui/QMatrix4x4>
-#include <grogl/GlProgram.h>
+#include <glue/GlProgram.h>
 #include <glm/glm.hpp>
 
 class Camera: public QObject, public RendererElement

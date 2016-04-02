@@ -1,9 +1,9 @@
 #include "Uniform.h"
 #include "Texture2D.h"
 #include "Texture3D.h"
-#include <grogl/GlProgram.h>
-#include <grogl/GlTexture2D.h>
-#include <grogl/GlTexture3D.h>
+#include <glue/GlProgram.h>
+#include <glue/GlTexture2D.h>
+#include <glue/GlTexture3D.h>
 
 Uniform::Uniform(QObject* parent):
     QObject(parent)

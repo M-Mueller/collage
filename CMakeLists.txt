@@ -3,10 +3,10 @@ project(vis)
 
 option(BUILD_DOCUMENTATION "Generate Doxygen documentation" OFF)
 
-find_package(Qt5Widgets)
+find_package(Qt5Quick)
 
 if(BUILD_DOCUMENTATION)
-	find_package(Doxygen)
+    find_package(Doxygen)
     if(NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen must be installed to build the documentation.")
 	else()
@@ -19,9 +19,7 @@ if(BUILD_DOCUMENTATION)
     endif()
 endif()
 
-#find_package(grogl REQUIRED)
-set(GROGL_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/../grogl/include)
-set(GROGL_LIBRARIES optimized ${CMAKE_SOURCE_DIR}/../grogl-build-release/libgrogl.a debug ${CMAKE_SOURCE_DIR}/../grogl-build-debug/libgrogl.a)
+add_subdirectory(glue)
 
 # enable Easylogging Qt support
 add_definitions(-DELPP_QT_LOGGING)
@@ -78,7 +76,7 @@ set(QML
 
 qt5_add_resources(RESOURCES qml.qrc)
 
-include_directories(include ${GROGL_INCLUDE_DIRS})
+include_directories(include glue/include)
 add_executable(vis ${SOURCES} ${HEADERS} ${RESOURCES} ${QML})
-target_link_libraries(vis ${GROGL_LIBRARIES} -ldl -lpng)
-qt5_use_modules(vis Core Gui Qml Quick Widgets)
+target_link_libraries(vis glue -ldl -lpng)
+qt5_use_modules(vis Core Gui Qml Quick)

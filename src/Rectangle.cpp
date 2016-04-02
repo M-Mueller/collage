@@ -1,8 +1,8 @@
 #include "Rectangle.h"
-#include <grogl/GlVertexBuffer.h>
-#include <grogl/GlIndexBuffer.h>
-#include <grogl/GlVertexArray.h>
-#include <grogl/GlTexture2D.h>
+#include <glue/GlVertexBuffer.h>
+#include <glue/GlIndexBuffer.h>
+#include <glue/GlVertexArray.h>
+#include <glue/GlTexture2D.h>
 #include <glm/gtc/type_ptr.hpp>
 
 Rectangle::Rectangle(QObject* parent):

@@ -33,8 +33,6 @@ public:
 
     GlTexture3D* gl();
 
-    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos);
-
     QVector3D spacing() const;
 
 public slots:
@@ -46,6 +44,9 @@ public slots:
     void setSpacing(const QVector3D& spacing);
 
     void setSource(const QString& source);
+
+protected:
+    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
 
 private:
     bool loadMHD(const QString& header);

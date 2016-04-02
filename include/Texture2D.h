@@ -30,8 +30,6 @@ public:
 
     GlTexture2D* gl();
 
-    virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos);
-
 public slots:
     void setHeight(int height);
     void setWidth(int width);
@@ -43,6 +41,9 @@ public slots:
      * The image is expected to be in the format RGB32 or ARGB32, any other format will be implicitly converted.
      */
     void setSource(const QString& source);
+
+protected:
+    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
 
 private:
     int _width;

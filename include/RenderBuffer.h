@@ -16,13 +16,14 @@ public:
     int width() const;
     int height() const;
 
-    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos);
-
     void synchronize();
 
 public slots:
     void setWidth(int width);
     void setHeight(int height);
+
+protected:
+    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
 
 private:
     int _width;

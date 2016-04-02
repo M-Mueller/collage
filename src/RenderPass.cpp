@@ -6,8 +6,8 @@
 
 #include <QtCore/QFile>
 
-#include <grogl/GlProgram.h>
-#include <grogl/GlFrameBuffer.h>
+#include <glue/GlProgram.h>
+#include <glue/GlFrameBuffer.h>
 
 #include <glad/glad.h>
 

@@ -1,6 +1,6 @@
 #include "Texture2D.h"
-#include <grogl/GlTexture2D.h>
-#include <grogl/GlFrameBuffer.h>
+#include <glue/GlTexture2D.h>
+#include <glue/GlFrameBuffer.h>
 #include <glm/glm.hpp>
 
 #include "easylogging++.h"
