@@ -17,6 +17,7 @@
 #include "Rectangle.h"
 #include "NearClippingRectangle.h"
 #include "Cube.h"
+#include "ClearFramebuffer.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
     qmlRegisterType<NearClippingRectangle>("NearClippingRectangle", 1, 0, "NearClippingRectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
+    qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

@@ -19,11 +19,7 @@ RenderPass::RenderPass(QObject* parent):
     _program(nullptr),
     _camera(new Camera(this)),
     _renderToTexture(nullptr),
-    _viewport(QRect()),
-    _clearColorBuffer(false),
-    _clearDepthBuffer(false),
-    _clearColor(Qt::black),
-    _clearDepth(1.0f)
+    _viewport(QRect())
 {
 
 }
@@ -113,10 +109,6 @@ void RenderPass::synchronize()
 
     _viewport.synchronize();
     _depthTest.synchronize();
-    _clearColorBuffer.synchronize();
-    _clearDepthBuffer.synchronize();
-    _clearColor.synchronize();
-    _clearDepth.synchronize();
 
     RendererElement::synchronize();
 }
@@ -138,15 +130,6 @@ void RenderPass::render()
         _renderToTexture->gl()->bind();
         glViewport(_viewport.gl().x(), _viewport.gl().y(), _viewport.gl().width(), _viewport.gl().height());
     }
-
-    glClearColor(_clearColor.gl().r, _clearColor.gl().g, _clearColor.gl().b, _clearColor.gl().a);
-    glClearDepth(_clearDepth.gl());
-    if(_clearColorBuffer.gl() && _clearDepthBuffer.gl())
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    else if(_clearColorBuffer.gl())
-        glClear(GL_COLOR_BUFFER_BIT);
-    else if(_clearDepthBuffer.gl())
-        glClear(GL_DEPTH_BUFFER_BIT);
 
     if(_depthTest.gl())
         glEnable(GL_DEPTH_TEST);
@@ -242,46 +225,6 @@ bool RenderPass::depthTest() const
 void RenderPass::setDepthTest(bool depthTest)
 {
     _depthTest = depthTest;
-}
-
-float RenderPass::clearDepth() const
-{
-    return _clearDepth;
-}
-
-void RenderPass::setClearDepth(float clearDepth)
-{
-    _clearDepth = clearDepth;
-}
-
-QColor RenderPass::clearColor() const
-{
-    return _clearColor;
-}
-
-void RenderPass::setClearColor(const QColor& clearColor)
-{
-    _clearColor = clearColor;
-}
-
-bool RenderPass::clearDepthBuffer() const
-{
-    return _clearDepthBuffer;
-}
-
-void RenderPass::setClearDepthBuffer(bool clearDepthBuffer)
-{
-    _clearDepthBuffer = clearDepthBuffer;
-}
-
-bool RenderPass::clearColorBuffer() const
-{
-    return _clearColorBuffer;
-}
-
-void RenderPass::setClearColorBuffer(bool clearColorBuffer)
-{
-    _clearColorBuffer = clearColorBuffer;
 }
 
 QRect RenderPass::viewport() const

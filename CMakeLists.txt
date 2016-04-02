@@ -47,9 +47,10 @@ set(SOURCES
     src/Rectangle.cpp
     src/NearClippingRectangle.cpp
     src/Cube.cpp
+    src/ClearFramebuffer.cpp
 )
 
-set(HEADERS 
+set(HEADERS
     include/VisualizationFramebuffer.h
     include/VisualizationRenderer.h
     include/RendererElement.h
@@ -67,6 +68,7 @@ set(HEADERS
     include/Rectangle.h
     include/NearClippingRectangle.h
     include/Cube.h
+    include/ClearFramebuffer.h
 )
 
 set(QML

@@ -17,6 +17,7 @@ import TurnTableCamera 1.0
 import Rectangle 1.0
 import NearClippingRectangle 1.0
 import Cube 1.0
+import ClearFramebuffer 1.0
 
 VisualizationFramebuffer {
     id: vis
@@ -74,9 +75,6 @@ VisualizationFramebuffer {
 
         depthTest: true
 
-        clearColorBuffer: true
-        clearDepthBuffer: true
-
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
                 id: rayEntryTex
@@ -90,6 +88,11 @@ VisualizationFramebuffer {
                 width: vis.width
                 height: vis.height
             }
+        }
+
+        ClearFramebuffer {
+            clearColorBuffer: true
+            clearDepthBuffer: true
         }
 
         // first render the nearclipping plane as fallback position if the camera is inside the cube
@@ -119,9 +122,6 @@ VisualizationFramebuffer {
 
         depthTest: true
 
-        clearColorBuffer: false // already cleared by qt
-        clearDepthBuffer: true
-
         uniforms: [
             UniformSampler2D {
                 name: "rayEntryTex"
@@ -147,6 +147,11 @@ VisualizationFramebuffer {
                 value: 0.5
             }
         ]
+
+        ClearFramebuffer {
+            clearColorBuffer: false // already cleared by qt
+            clearDepthBuffer: true
+        }
 
         // render only the backfaces of the cube as exit positions for the rays
         Cube {

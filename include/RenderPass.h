@@ -26,10 +26,6 @@ class RenderPass: public QObject, public RendererElement
     Q_PROPERTY(Framebuffer* renderToTexture READ renderToTexture WRITE setRenderToTexture)
     Q_PROPERTY(QRect viewport READ viewport WRITE setViewport)
     Q_PROPERTY(bool depthTest READ depthTest WRITE setDepthTest)
-    Q_PROPERTY(bool clearColorBuffer READ clearColorBuffer WRITE setClearColorBuffer)
-    Q_PROPERTY(bool clearDepthBuffer READ clearDepthBuffer WRITE setClearDepthBuffer)
-    Q_PROPERTY(QColor clearColor READ clearColor WRITE setClearColor)
-    Q_PROPERTY(float clearDepth READ clearDepth WRITE setClearDepth)
     Q_PROPERTY(QQmlListProperty<Uniform> uniforms READ uniforms)
     Q_PROPERTY(QQmlListProperty<Entity> entities READ entities)
     Q_CLASSINFO("DefaultProperty", "entities")
@@ -52,11 +48,6 @@ public:
 
     bool depthTest() const;
 
-    bool clearColorBuffer() const;
-    bool clearDepthBuffer() const;
-    QColor clearColor() const;
-    float clearDepth() const;
-
 public slots:
     void setVertexShaderPath(const QString& vertexShaderPath);
     void setGeometryShaderPath(const QString& geometryShaderPath);
@@ -68,11 +59,6 @@ public slots:
     void setViewport(const QRect& viewport);
 
     void setDepthTest(bool depthTest);
-
-    void setClearColorBuffer(bool clearColorBuffer);
-    void setClearDepthBuffer(bool clearDepthBuffer);
-    void setClearColor(const QColor& clearColor);
-    void setClearDepth(float clearDepth);
 
     Q_INVOKABLE void reloadShaders();
 
@@ -103,11 +89,6 @@ private:
 
     RendererProperty<QRect> _viewport;
     RendererProperty<bool> _depthTest;
-    RendererProperty<bool> _clearColorBuffer;
-    RendererProperty<bool> _clearDepthBuffer;
-    RendererProperty<QColor, glm::vec4> _clearColor;
-    RendererProperty<float> _clearDepth;
-
 };
 
 

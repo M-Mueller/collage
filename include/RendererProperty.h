@@ -90,6 +90,16 @@ public:
         return *this;
     }
 
+    bool operator==(const T& v)
+    {
+        return value == v;
+    }
+
+    bool operator!=(const T& v)
+    {
+        return value != v;
+    }
+
     /**
      * @brief Returns the property value for the rendering thread.
      */
