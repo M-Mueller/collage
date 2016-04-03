@@ -1,8 +1,12 @@
 #include "Cube.h"
+
 #include <glue/GlVertexArray.h>
 #include <glue/GlVertexBuffer.h>
 #include <glue/GlIndexBuffer.h>
+#include <glue/GlProgram.h>
+
 #include <glad/glad.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(QObject* parent):

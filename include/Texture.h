@@ -12,6 +12,7 @@ class Texture: public QObject, public RendererElement
     Q_PROPERTY(int channels READ channels WRITE setChannels)
 
     friend class Framebuffer;
+    friend class Sampler;
 public:
     enum Type
     {
@@ -47,6 +48,7 @@ protected:
      * This method should be used exclusively by the Framebuffer class.
      */
     virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) =0;
+    virtual void bind(int unit) =0;
 
 protected:
     Type _type;

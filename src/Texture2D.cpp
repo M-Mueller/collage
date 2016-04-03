@@ -179,6 +179,12 @@ void Texture2D::attachTo(Framebuffer& fbo, Framebuffer::Attachment pos)
     }
 }
 
+void Texture2D::bind(int unit)
+{
+    if(_tex)
+        _tex->bind(unit);
+}
+
 QString Texture2D::source() const
 {
     return _source;

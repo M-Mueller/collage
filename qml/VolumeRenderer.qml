@@ -2,11 +2,6 @@ import QtQuick 2.5 as QtQuick
 
 import visualizationframebuffer 1.0
 import RenderPass 1.0
-import UniformInt 1.0
-import UniformFloat 1.0
-import UniformVec3 1.0
-import UniformSampler2D 1.0
-import UniformSampler3D 1.0
 import Texture 1.0
 import Texture2D 1.0
 import Texture3D 1.0
@@ -18,16 +13,20 @@ import Rectangle 1.0
 import NearClippingRectangle 1.0
 import Cube 1.0
 import ClearFramebuffer 1.0
+import Uniforms 1.0
+import Sampler 1.0
 
 VisualizationFramebuffer {
     id: vis
-    anchors.fill: parent
+
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1} // flip the whole image
 
     function reloadShaders() {
         rayEntryPointsPass.reloadShaders()
         raycastingPass.reloadShaders()
     }
+
+    property alias mode: raycastingUniforms.mode
 
     QtQuick.MouseArea {
         anchors.fill: parent;
@@ -57,6 +56,7 @@ VisualizationFramebuffer {
 
     TurnTableCamera {
         id: camera
+        aspectRatio: vis.width/vis.height
     }
 
     Texture3D {
@@ -64,13 +64,12 @@ VisualizationFramebuffer {
         source: "/home/markus/Data/Bucky.mhd"
     }
 
-    // Determine the entry points of the rays by drawing a cube that has its coordinates a colors
+    // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayEntryPointsPass
         vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
 
-        camera: camera
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
         depthTest: true
@@ -88,6 +87,11 @@ VisualizationFramebuffer {
                 width: vis.width
                 height: vis.height
             }
+        }
+
+        Uniforms {
+            property matrix4x4 viewMatrix: camera.viewMatrix
+            property matrix4x4 projectionMatrix: camera.projectionMatrix
         }
 
         ClearFramebuffer {
@@ -117,36 +121,26 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
 
-        camera: camera
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
         depthTest: true
 
-        uniforms: [
-            UniformSampler2D {
-                name: "rayEntryTex"
-                value: rayEntryTex
+        Uniforms {
+            id: raycastingUniforms
+            property Sampler rayEntryTex: Sampler {
+                texture: rayEntryTex
                 unit: 1
-            },
-            UniformSampler3D {
-                name: "volume"
-                value: volume
-                unit: 2
-            },
-            UniformFloat {
-                name: "step"
-                value: 0.001
-            },
-            UniformInt {
-                id: mode
-                name: "mode"
-                value: 0
-            },
-            UniformFloat {
-                name: "iso"
-                value: 0.5
             }
-        ]
+            property Sampler volume: Sampler {
+                texture: volume
+                unit: 2
+            }
+            property double step: 0.001
+            property int mode: 0
+            property double iso: 0.5
+            property matrix4x4 viewMatrix: camera.viewMatrix
+            property matrix4x4 projectionMatrix: camera.projectionMatrix
+        }
 
         ClearFramebuffer {
             clearColorBuffer: false // already cleared by qt

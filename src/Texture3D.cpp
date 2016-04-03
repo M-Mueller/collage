@@ -129,7 +129,13 @@ void Texture3D::attachTo(Framebuffer& /*fbo*/, Framebuffer::Attachment /*pos*/)
 //    else
 //    {
 //        LOG(ERROR) << "Texture could not be attached";
-//    }
+    //    }
+}
+
+void Texture3D::bind(int unit)
+{
+    if(_tex)
+        _tex->bind(unit);
 }
 
 int Texture3D::width() const

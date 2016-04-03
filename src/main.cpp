@@ -5,7 +5,6 @@
 
 #include "VisualizationFramebuffer.h"
 #include "RenderPass.h"
-#include "Uniform.h"
 #include "Texture.h"
 #include "Texture2D.h"
 #include "Texture3D.h"
@@ -18,6 +17,7 @@
 #include "NearClippingRectangle.h"
 #include "Cube.h"
 #include "ClearFramebuffer.h"
+#include "Uniforms.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -27,12 +27,6 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
-    qmlRegisterUncreatableType<Uniform>("Uniform", 1, 0, "Uniform", "Uniform is abstract");
-    qmlRegisterType<UniformInt>("UniformInt", 1, 0, "UniformInt");
-    qmlRegisterType<UniformFloat>("UniformFloat", 1, 0, "UniformFloat");
-    qmlRegisterType<UniformVec3>("UniformVec3", 1, 0, "UniformVec3");
-    qmlRegisterType<UniformSampler2D>("UniformSampler2D", 1, 0, "UniformSampler2D");
-    qmlRegisterType<UniformSampler3D>("UniformSampler3D", 1, 0, "UniformSampler3D");
 
     qmlRegisterUncreatableType<Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
     qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
@@ -49,6 +43,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<NearClippingRectangle>("NearClippingRectangle", 1, 0, "NearClippingRectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
     qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
+    qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
+    qmlRegisterType<Sampler>("Sampler", 1, 0, "Sampler");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

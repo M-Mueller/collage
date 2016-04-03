@@ -6,11 +6,10 @@ TurnTableCamera::TurnTableCamera(QObject* parent):
     Camera(parent),
     _phi(0.0),
     _theta(glm::radians(90.0)),
-    _radius(4.0)
+    _radius(4.0),
+    _aspectRatio(1.0)
 {
-    //TODO
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 640/(float)480, 1.0f, 100.f);
-    setProjectionMatrix(QMatrix4x4(glm::value_ptr(projectionMatrix)));
+    updateProjectionMatrix();
     updateViewMatrix();
 }
 
@@ -48,11 +47,32 @@ double TurnTableCamera::radius() const
     return _radius;
 }
 
+double TurnTableCamera::aspectRatio() const
+{
+    return _aspectRatio;
+}
+
 void TurnTableCamera::setRadius(double radius)
 {
     _radius = glm::clamp(radius, 0.1, 100.0);
     updateViewMatrix();
     emit radiusChanged(_radius);
+}
+
+void TurnTableCamera::setAspectRatio(double aspectRatio)
+{
+    if(aspectRatio != aspectRatio)
+        _aspectRatio = 0; // aspect ratio is typically width/height which is NaN if height is 0
+    else
+        _aspectRatio = aspectRatio;
+    updateProjectionMatrix();
+    emit aspectRatioChanged(_aspectRatio);
+}
+
+void TurnTableCamera::updateProjectionMatrix()
+{
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(_aspectRatio), 1.0f, 100.f);
+    setProjectionMatrix(QMatrix4x4(glm::value_ptr(projectionMatrix)));
 }
 
 void TurnTableCamera::updateViewMatrix()

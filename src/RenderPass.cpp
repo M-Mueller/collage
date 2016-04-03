@@ -1,8 +1,6 @@
 #include "RenderPass.h"
 #include "Entity.h"
-#include "Camera.h"
 #include "Framebuffer.h"
-#include "Uniform.h"
 
 #include <QtCore/QFile>
 
@@ -17,7 +15,6 @@ RenderPass::RenderPass(QObject* parent):
     QObject(parent),
     _forceShaderReload(false),
     _program(nullptr),
-    _camera(new Camera(this)),
     _renderToTexture(nullptr),
     _viewport(QRect())
 {
@@ -137,25 +134,16 @@ void RenderPass::render()
         glDisable(GL_DEPTH_TEST);
 
     _program->activate();
-    if(_camera)
-    {
-        _camera->applyMatrices(*_program);
-    }
-
-    for(auto uniform: _uniforms)
-    {
-        uniform->set(*_program);
-    }
 
     for(auto entity: _entities)
     {
         entity->render(*_program);
     }
 
-    for(auto uniform: _uniforms)
-    {
-        uniform->releaseResources();
-    }
+//    for(auto uniform: _uniforms)
+//    {
+//        uniform->releaseResources();
+//    }
 
     _program->deactivate();
 
@@ -165,12 +153,6 @@ void RenderPass::render()
         glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
         glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
     }
-}
-
-QQmlListProperty<Uniform> RenderPass::uniforms()
-{
-    return QQmlListProperty<Uniform>(this, 0, &RenderPass::appendUniform, &RenderPass::uniformCount,
-                                    &RenderPass::uniformAt, &RenderPass::clearUniform);
 }
 
 QQmlListProperty<Entity> RenderPass::entities()
@@ -234,49 +216,16 @@ QRect RenderPass::viewport() const
 
 void RenderPass::setViewport(const QRect& viewport)
 {
+    if(_viewport == viewport)
+        return;
+
     _viewport = viewport;
+    emit viewportChanged(viewport);
 }
 
 void RenderPass::reloadShaders()
 {
     _forceShaderReload = true;
-}
-
-void RenderPass::appendUniform(QQmlListProperty<Uniform>* list, Uniform* value)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
-    {
-        if(!pass->_uniforms.contains(value))
-        {
-            pass->_uniforms.append(value);
-        }
-    }
-}
-
-Uniform* RenderPass::uniformAt(QQmlListProperty<Uniform>* list, int index)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
-    {
-        return pass->_uniforms.value(index, nullptr);
-    }
-    return nullptr;
-}
-
-void RenderPass::clearUniform(QQmlListProperty<Uniform>* list)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
-    {
-        pass->_uniforms.clear();
-    }
-}
-
-int RenderPass::uniformCount(QQmlListProperty<Uniform>* list)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
-    {
-        return pass->_uniforms.count();
-    }
-    return 0;
 }
 
 Framebuffer* RenderPass::renderToTexture() const
@@ -287,16 +236,4 @@ Framebuffer* RenderPass::renderToTexture() const
 void RenderPass::setRenderToTexture(Framebuffer* renderToTexture)
 {
     _renderToTexture = renderToTexture;
-}
-
-Camera* RenderPass::camera() const
-{
-    return _camera;
-}
-
-void RenderPass::setCamera(Camera* camera)
-{
-    if(_camera->parent() == this)
-        _camera->deleteLater();
-    _camera = camera;
 }

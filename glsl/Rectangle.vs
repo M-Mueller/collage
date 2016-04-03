@@ -1,7 +1,7 @@
 #version 330
 
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix = mat4(1.0);
+uniform mat4 projectionMatrix = mat4(1.0);
 
 layout(location = 0) in vec2 position;
 layout(location = 1) in vec3 color;

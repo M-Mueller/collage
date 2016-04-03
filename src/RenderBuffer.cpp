@@ -1,8 +1,8 @@
 #include "RenderBuffer.h"
+#include "easylogging++.h"
+
 #include <glue/GlFrameBuffer.h>
 #include <glue/GlRenderBuffer.h>
-
-#include "easylogging++.h"
 
 #include <cassert>
 
@@ -44,6 +44,11 @@ void RenderBuffer::attachTo(Framebuffer& fbo, Framebuffer::Attachment pos)
     {
         LOG(ERROR) << "Texture could not be attached";
     }
+}
+
+void RenderBuffer::bind(int /*unit*/)
+{
+    LOG(ERROR) << "Renderbuffers cannot be used in samplers";
 }
 
 void RenderBuffer::synchronize()

@@ -10,7 +10,7 @@ if(BUILD_DOCUMENTATION)
     if(NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen must be installed to build the documentation.")
 	else()
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 	    add_custom_target(doc
 		    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 		    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -33,7 +33,6 @@ set(SOURCES
     src/VisualizationRenderer.cpp
     src/RendererElement.cpp
     src/RenderPass.cpp
-    src/Uniform.cpp
     src/Texture.cpp
     src/Texture2D.cpp
     src/Texture3D.cpp
@@ -46,6 +45,7 @@ set(SOURCES
     src/NearClippingRectangle.cpp
     src/Cube.cpp
     src/ClearFramebuffer.cpp
+    src/Uniforms.cpp
 )
 
 set(HEADERS
@@ -54,7 +54,6 @@ set(HEADERS
     include/RendererElement.h
     include/RendererProperty.h
     include/RenderPass.h
-    include/Uniform.h
     include/Texture.h
     include/Texture2D.h
     include/Texture3D.h
@@ -67,6 +66,7 @@ set(HEADERS
     include/NearClippingRectangle.h
     include/Cube.h
     include/ClearFramebuffer.h
+    include/Uniforms.h
 )
 
 set(QML

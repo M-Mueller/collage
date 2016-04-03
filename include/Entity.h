@@ -3,7 +3,8 @@
 
 #include "RendererElement.h"
 #include <QtCore/QObject>
-#include <glue/GlProgram.h>
+
+class GlProgram;
 
 /**
  * @brief The Entity class is the base class of all drawable objects.

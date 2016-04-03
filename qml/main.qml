@@ -1,8 +1,9 @@
-import QtQuick 2.5 as QtQuick
-import QtQuick.Controls 1.4 as QtControls
-import QtQuick.Dialogs 1.2 as QtDialog
+import QtQuick 2.5
+import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.2
+import QtQuick.Layouts 1.3
 
-QtControls.ApplicationWindow {
+ApplicationWindow {
     id: applicationWindow1
     visible: true
     width: 640
@@ -10,14 +11,14 @@ QtControls.ApplicationWindow {
     color: "#343434"
     title: qsTr("Hello World")
 
-    menuBar: QtControls.MenuBar {
-        QtControls.Menu {
+    menuBar: MenuBar {
+        Menu {
             title: qsTr("File")
-            QtControls.MenuItem {
+            MenuItem {
                 text: qsTr("&Open")
                 onTriggered: console.log("Open action triggered");
             }
-            QtControls.MenuItem {
+            MenuItem {
                 text: qsTr("Exit")
                 onTriggered: Qt.quit();
             }
@@ -26,23 +27,48 @@ QtControls.ApplicationWindow {
 
     VolumeRenderer {
         id: volumeRenderer
-        x: 227
-        y: 0
-        width: 413
-        height: 480
-
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        anchors.left: column1.right
+        anchors.leftMargin: 0
     }
 
-    QtControls.Button {
-        id: reloadShaders
-        x: 45
-        y: 46
-        text: qsTr("Button")
+    Column {
+        id: column1
+        width: 200
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        spacing: 9
 
-        onClicked: {
-            volumeRenderer.reloadShaders()
-            volumeRenderer.update()
+        Button {
+            id: reloadShaders
+            text: qsTr("Reload Shaders")
+
+            onClicked: {
+                volumeRenderer.reloadShaders()
+                volumeRenderer.update()
+            }
         }
+
+        SpinBox {
+            minimumValue: 0
+            maximumValue: 1
+            value: volumeRenderer.mode
+
+            onValueChanged: {
+                volumeRenderer.mode = value
+                volumeRenderer.update()
+            }
+        }
+
     }
 }
 

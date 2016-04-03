@@ -24,6 +24,7 @@ public slots:
 
 protected:
     void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
+    void bind(int unit) override;
 
 private:
     int _width;
