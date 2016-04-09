@@ -14,6 +14,7 @@ import NearClippingRectangle 1.0
 import Cube 1.0
 import ClearFramebuffer 1.0
 import Uniforms 1.0
+import UniformStruct 1.0
 import BindTexture 1.0
 
 VisualizationFramebuffer {
@@ -57,6 +58,17 @@ VisualizationFramebuffer {
     TurnTableCamera {
         id: camera
         aspectRatio: vis.width/vis.height
+
+        function center() {
+            var invModelView = camera.viewMatrix.inverted()
+            return invModelView.times(Qt.vector3d(0, 0, 0))
+        }
+    }
+
+    QtQuick.QtObject {
+        id: light
+        property vector3d position: Qt.vector3d(50, 50, 50)
+        property color color: "#88EEEEFF"
     }
 
     Texture3D {
@@ -139,11 +151,16 @@ VisualizationFramebuffer {
             id: raycastingUniforms
             property int rayEntryTex: 1
             property int volume: 2
-            property double step: 0.001
+            property double step: 1.0/(2*32.0)
             property int mode: 0
             property double iso: 0.5
             property matrix4x4 viewMatrix: camera.viewMatrix
             property matrix4x4 projectionMatrix: camera.projectionMatrix
+            property UniformStruct light: UniformStruct {
+                property vector3d position: light.position
+                property color color: light.color
+            }
+            property vector3d viewer: camera.center()
         }
 
         ClearFramebuffer {

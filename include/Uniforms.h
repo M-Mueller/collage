@@ -28,6 +28,15 @@ public:
 
 private:
     QList<QPair<QString, QVariant>> _uniforms;
+    int _struct_type;
 };
+
+class UniformStruct: public QObject
+{
+    Q_OBJECT
+public:
+    UniformStruct(QObject* parent=0);
+};
+Q_DECLARE_METATYPE(UniformStruct*);
 
 #endif // UNIFORMS_H

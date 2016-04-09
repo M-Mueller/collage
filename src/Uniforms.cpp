@@ -12,9 +12,10 @@
 #include <glue/GlProgram.h>
 
 Uniforms::Uniforms(QObject* parent):
-    Entity(parent)
+    Entity(parent),
+    _struct_type(-1)
 {
-
+    _struct_type = qRegisterMetaType<UniformStruct*>();
 }
 
 void Uniforms::synchronize()
@@ -30,7 +31,32 @@ void Uniforms::synchronize()
 
         if(name != "objectName")
         {
-            _uniforms.push_back(QPair<QString, QVariant>(name, value));
+            if(value.type() == QVariant::UserType && value.userType() == _struct_type)
+            {
+                // add the properties of UniformStructs as <structname>.<membername>
+                auto ustruct = value.value<UniformStruct*>();
+                if(!ustruct)
+                {
+                    LOG(ERROR) << "Unexpected QVariant type";
+                    continue;
+                }
+
+                for(int j=0; j<ustruct->metaObject()->propertyCount(); ++j)
+                {
+                    auto memberProperty = ustruct->metaObject()->property(j);
+                    QString memberName = memberProperty.name();
+                    QVariant memberValue = memberProperty.read(ustruct);
+
+                    if(memberName != "objectName")
+                    {
+                        _uniforms.push_back(QPair<QString, QVariant>(name + "." + memberName, memberValue));
+                    }
+                }
+            }
+            else
+            {
+                _uniforms.push_back(QPair<QString, QVariant>(name, value));
+            }
         }
     }
 }
@@ -71,8 +97,18 @@ void Uniforms::render(GlProgram& program)
         case QVariant::Matrix4x4:
             program.setUniform(name.toStdString(), value.value<QMatrix4x4>());
             break;
+        case QVariant::Size:
+            program.setUniform(name.toStdString(), value.value<QSize>());
+            break;
         default:
             LOG(WARNING) << "Uniform '" << name << "': Unsupported type";
         }
     }
+}
+
+
+UniformStruct::UniformStruct(QObject* parent):
+    QObject(parent)
+{
+
 }

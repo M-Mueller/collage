@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
     qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
     qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
+    qmlRegisterType<UniformStruct>("UniformStruct", 1, 0, "UniformStruct");
     qmlRegisterType<BindTexture>("BindTexture", 1, 0, "BindTexture");
 
     QQmlApplicationEngine engine;
