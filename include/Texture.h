@@ -12,7 +12,7 @@ class Texture: public QObject, public RendererElement
     Q_PROPERTY(int channels READ channels WRITE setChannels)
 
     friend class Framebuffer;
-    friend class Sampler;
+    friend class BindTexture;
 public:
     enum Type
     {
@@ -49,6 +49,7 @@ protected:
      */
     virtual void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) =0;
     virtual void bind(int unit) =0;
+    virtual void unbind(int unit) =0;
 
 protected:
     Type _type;

@@ -48,7 +48,12 @@ void RenderBuffer::attachTo(Framebuffer& fbo, Framebuffer::Attachment pos)
 
 void RenderBuffer::bind(int /*unit*/)
 {
-    LOG(ERROR) << "Renderbuffers cannot be used in samplers";
+    LOG(ERROR) << "Renderbuffers cannot be used in BindTexture";
+}
+
+void RenderBuffer::unbind(int /*unit*/)
+{
+    LOG(ERROR) << "Renderbuffers cannot be used in BindTexture";
 }
 
 void RenderBuffer::synchronize()

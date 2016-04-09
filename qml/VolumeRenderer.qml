@@ -14,7 +14,7 @@ import NearClippingRectangle 1.0
 import Cube 1.0
 import ClearFramebuffer 1.0
 import Uniforms 1.0
-import Sampler 1.0
+import BindTexture 1.0
 
 VisualizationFramebuffer {
     id: vis
@@ -125,16 +125,20 @@ VisualizationFramebuffer {
 
         depthTest: true
 
+        BindTexture {
+            texture: rayEntryTex
+            unit: 1
+        }
+
+        BindTexture {
+            texture: volume
+            unit: 2
+        }
+
         Uniforms {
             id: raycastingUniforms
-            property Sampler rayEntryTex: Sampler {
-                texture: rayEntryTex
-                unit: 1
-            }
-            property Sampler volume: Sampler {
-                texture: volume
-                unit: 2
-            }
+            property int rayEntryTex: 1
+            property int volume: 2
             property double step: 0.001
             property int mode: 0
             property double iso: 0.5

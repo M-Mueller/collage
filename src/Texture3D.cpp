@@ -138,6 +138,12 @@ void Texture3D::bind(int unit)
         _tex->bind(unit);
 }
 
+void Texture3D::unbind(int unit)
+{
+    if(_tex)
+        _tex->release(unit);
+}
+
 int Texture3D::width() const
 {
     return _width;

@@ -7,7 +7,7 @@
 class GlProgram;
 
 /**
- * @brief The Entity class is the base class of all drawable objects.
+ * The Entity class is the base class of all drawable objects.
  * Because this object is used by the \ref VisualizationRenderer, it must split its properties from the renderer properties.
  * That also means any calls to OpenGL should only be performed in synchronize() and render().
  */
@@ -19,15 +19,16 @@ public:
     virtual ~Entity();
 
     /**
-     * @brief Renders the entity with the given program.
-     * The program will be already activated before calling this method.
-     * The shader will contain two preset uniforms for the camera:
-     * \code
-     * uniform mat4 viewMatrix;
-     * uniform mat4 projectionMatrix;
-     * \endcode
+     * Renders the entity with the given program.
+     * The program is always activated when this method is called.
      */
     virtual void render(GlProgram& program) =0;
+
+    /**
+     * Resets any global state that was change during render().
+     * The default implementation does nothing.
+     */
+    virtual void resetStates(GlProgram& program);
 };
 
 #endif // ENTITY_H

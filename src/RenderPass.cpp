@@ -115,7 +115,7 @@ void RenderPass::render()
     if(!_program)
         return;
 
-    GLint prevFBO;
+    GLint prevFBO = 0;
     GLint prevViewport[4];
     if(_renderToTexture)
     {
@@ -140,10 +140,10 @@ void RenderPass::render()
         entity->render(*_program);
     }
 
-//    for(auto uniform: _uniforms)
-//    {
-//        uniform->releaseResources();
-//    }
+    for(auto entity = _entities.rbegin(); entity != _entities.rend(); ++entity)
+    {
+        (*entity)->resetStates(*_program);
+    }
 
     _program->deactivate();
 

@@ -18,6 +18,7 @@
 #include "Cube.h"
 #include "ClearFramebuffer.h"
 #include "Uniforms.h"
+#include "BindTexture.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
     qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
     qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
-    qmlRegisterType<Sampler>("Sampler", 1, 0, "Sampler");
+    qmlRegisterType<BindTexture>("BindTexture", 1, 0, "BindTexture");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

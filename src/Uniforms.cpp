@@ -1,6 +1,4 @@
 #include "Uniforms.h"
-#include "Texture2D.h"
-#include "Texture3D.h"
 #include "easylogging++.h"
 
 #include <QtGui/QVector2D>
@@ -8,19 +6,15 @@
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QColor>
 #include <QtCore/QEvent>
-#include <QtCore/QDynamicPropertyChangeEvent>
 #include <QtCore/QMetaProperty>
 #include <QtCore/QMetaType>
 
 #include <glue/GlProgram.h>
-#include <glue/GlTexture2D.h>
-#include <glue/GlTexture3D.h>
 
 Uniforms::Uniforms(QObject* parent):
-    Entity(parent),
-    _sampler_type(-1)
+    Entity(parent)
 {
-    _sampler_type = qRegisterMetaType<Sampler*>();
+
 }
 
 void Uniforms::synchronize()
@@ -77,77 +71,8 @@ void Uniforms::render(GlProgram& program)
         case QVariant::Matrix4x4:
             program.setUniform(name.toStdString(), value.value<QMatrix4x4>());
             break;
-        case QVariant::UserType:
-        {
-            if(value.userType() == _sampler_type)
-                value.value<Sampler*>()->set(name, program);
-            else
-                LOG(WARNING) << "Uniform '" << name << "': Unsupported type";
-            break;
-        }
         default:
             LOG(WARNING) << "Uniform '" << name << "': Unsupported type";
         }
     }
-}
-
-bool Uniforms::event(QEvent* event)
-{
-    if(event->type() == QEvent::DynamicPropertyChange)
-    {
-        auto changeEvent = dynamic_cast<QDynamicPropertyChangeEvent*>(event);
-        if(changeEvent)
-        {
-            LOG(INFO) << "Uniform added: " << changeEvent->propertyName();
-        }
-    }
-
-    return QObject::event(event);
-}
-
-
-
-Sampler::Sampler(QObject* parent):
-    QObject(parent),
-    _texture(nullptr),
-    _unit(0)
-{
-
-}
-
-Texture* Sampler::texture() const
-{
-    return _texture;
-}
-
-int Sampler::unit() const
-{
-    return _unit;
-}
-
-void Sampler::set(const QString& name, GlProgram& program)
-{
-    if(_texture)
-    {
-        _texture->bind(_unit);
-        program.setUniform(name.toStdString(), _unit);
-    }
-}
-
-void Sampler::setTexture(Texture* texture)
-{
-    if (_texture == texture)
-        return;
-
-    _texture = texture;
-    emit textureChanged(texture);
-}
-
-void Sampler::setUnit(int unit)
-{
-    if (_unit == unit)
-        return;
-
-    _unit = unit;
-    emit unitChanged(unit);
 }

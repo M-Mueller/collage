@@ -48,6 +48,7 @@ public slots:
 protected:
     void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
     void bind(int unit) override;
+    void unbind(int unit) override;
 
 private:
     bool loadMHD(const QString& header);

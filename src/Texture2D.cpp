@@ -185,6 +185,12 @@ void Texture2D::bind(int unit)
         _tex->bind(unit);
 }
 
+void Texture2D::unbind(int unit)
+{
+    if(_tex)
+        _tex->release(unit);
+}
+
 QString Texture2D::source() const
 {
     return _source;

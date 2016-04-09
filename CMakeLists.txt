@@ -46,6 +46,7 @@ set(SOURCES
     src/Cube.cpp
     src/ClearFramebuffer.cpp
     src/Uniforms.cpp
+    src/BindTexture.cpp
 )
 
 set(HEADERS
@@ -67,6 +68,7 @@ set(HEADERS
     include/Cube.h
     include/ClearFramebuffer.h
     include/Uniforms.h
+    include/BindTexture.h
 )
 
 set(QML

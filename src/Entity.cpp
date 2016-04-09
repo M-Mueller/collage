@@ -10,3 +10,8 @@ Entity::~Entity()
 {
 
 }
+
+void Entity::resetStates(GlProgram& /*program*/)
+{
+
+}
