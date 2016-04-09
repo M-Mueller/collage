@@ -20,6 +20,19 @@ uniform float iso;
 in vec3 fs_rayExit;
 out vec4 out_color;
 
+struct Ray
+{
+    vec3 position;
+    vec3 direction;
+    vec4 color;
+
+    // set to true if the ray can be terminated early
+    bool terminate;
+
+    // variables of the maximum mode
+    float maximum;
+};
+
 vec3 computePhongShading(vec3 pos, vec3 normal)
 {
     vec3 worldPos = (modelMatrix * vec4(pos - vec3(0.5), 1.0)).xyz;
@@ -46,18 +59,33 @@ vec3 computeNormal(vec3 pos)
     return normalize(vec3(dx/2, dy/2, dz/2));
 }
 
-struct Ray
+bool computeShadow(vec3 pos)
 {
-    vec3 position;
-    vec3 direction;
-    vec4 color;
+    // perform iso raycasting from position to light
+    vec3 lightWorld = (inverse(modelMatrix)*vec4(light.position, 1.0)).xyz;
+    Ray ray;
+    ray.position = pos;
+    ray.direction = normalize(lightWorld - pos);
+    ray.terminate = false;
 
-    // set to true if the ray can be terminated early
-    bool terminate;
+    float shadowStep = 2*step; // no accurate hit required
+    // start one step away from the already hit iso surface
+    ray.position += shadowStep*ray.direction;
 
-    // variables of the maximum mode
-    float maximum;
-};
+    for(int i=0; i<4096; ++i)
+    {
+        // FIXME: because of floating point errors, the first step is sometimes skipped
+        if(i > 0 && (any(lessThan(ray.position, vec3(0.0))) || any(greaterThan(ray.position, vec3(1.0)))))
+            return false;
+
+        float value = texture(volume, ray.position).r;
+        if(value >= iso)
+            return true;
+
+        ray.position += shadowStep*ray.direction;
+    }
+    out_color = ray.color;
+}
 
 Ray isoSurfaceStep(float value, Ray ray)
 {
@@ -78,6 +106,8 @@ Ray isoSurfaceStep(float value, Ray ray)
 
         vec3 normal = computeNormal(ray.position);
         ray.color = vec4(computePhongShading(ray.position, normal), 1.0);
+        if(computeShadow(ray.position))
+            ray.color.xyz *= 0.1;
         ray.terminate = true;
     }
     else
