@@ -34,6 +34,7 @@ set(SOURCES
     src/RendererElement.cpp
     src/RenderPass.cpp
     src/Texture.cpp
+    src/Texture1D.cpp
     src/Texture2D.cpp
     src/Texture3D.cpp
     src/Framebuffer.cpp
@@ -56,6 +57,7 @@ set(HEADERS
     include/RendererProperty.h
     include/RenderPass.h
     include/Texture.h
+    include/Texture1D.h
     include/Texture2D.h
     include/Texture3D.h
     include/Framebuffer.h
@@ -74,6 +76,9 @@ set(HEADERS
 set(QML
     qml/main.qml
     qml/VolumeRenderer.qml
+    qml/TransferFunctionEditor.qml
+    qml/PopupMenu.qml
+    qml/PopupMenu.js
 )
 
 qt5_add_resources(RESOURCES qml.qrc)

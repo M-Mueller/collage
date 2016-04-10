@@ -97,9 +97,6 @@ void Uniforms::render(GlProgram& program)
         case QVariant::Matrix4x4:
             program.setUniform(name.toStdString(), value.value<QMatrix4x4>());
             break;
-        case QVariant::Size:
-            program.setUniform(name.toStdString(), value.value<QSize>());
-            break;
         default:
             LOG(WARNING) << "Uniform '" << name << "': Unsupported type";
         }

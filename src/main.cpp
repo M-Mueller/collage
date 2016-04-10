@@ -6,6 +6,7 @@
 #include "VisualizationFramebuffer.h"
 #include "RenderPass.h"
 #include "Texture.h"
+#include "Texture1D.h"
 #include "Texture2D.h"
 #include "Texture3D.h"
 #include "Camera.h"
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
 
     qmlRegisterUncreatableType<Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
+    qmlRegisterType<Texture1D>("Texture1D", 1, 0, "Texture1D");
     qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
     qmlRegisterType<Texture3D>("Texture3D", 1, 0, "Texture3D");
 

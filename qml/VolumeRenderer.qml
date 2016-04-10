@@ -3,6 +3,7 @@ import QtQuick 2.5 as QtQuick
 import visualizationframebuffer 1.0
 import RenderPass 1.0
 import Texture 1.0
+import Texture1D 1.0
 import Texture2D 1.0
 import Texture3D 1.0
 import Camera 1.0
@@ -28,6 +29,7 @@ VisualizationFramebuffer {
     }
 
     property alias mode: raycastingUniforms.mode
+    property alias transferFunction: transferFunction
 
     QtQuick.MouseArea {
         anchors.fill: parent;
@@ -58,6 +60,7 @@ VisualizationFramebuffer {
     TurnTableCamera {
         id: camera
         aspectRatio: vis.width/vis.height
+        radius: 100
 
         function center() {
             var invModelView = camera.viewMatrix.inverted()
@@ -74,6 +77,21 @@ VisualizationFramebuffer {
     Texture3D {
         id: volume
         source: "/home/markus/Data/Bucky.mhd"
+    }
+
+    Texture1D {
+        id: transferFunction
+        width: 256
+
+        QtQuick.Component.onCompleted: {
+            // initialize with ramp
+            var tf = []
+            for(var i=0; i<transferFunction.width; ++i) {
+                var a = i/transferFunction.width;
+                tf[i] = Qt.rgba(a, a, a, a)
+            }
+            transferFunction.load(tf)
+        }
     }
 
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
@@ -147,15 +165,21 @@ VisualizationFramebuffer {
             unit: 2
         }
 
+        BindTexture {
+            texture: transferFunction
+            unit: 3
+        }
+
         Uniforms {
             id: raycastingUniforms
-            property int rayEntryTex: 1
-            property int volume: 2
-            property double step: 1.0/(2*32.0)
-            property int mode: 0
-            property double iso: 0.5
             property matrix4x4 viewMatrix: camera.viewMatrix
             property matrix4x4 projectionMatrix: camera.projectionMatrix
+            property int rayEntryTex: 1
+            property int volume: 2
+            property double step: 1.0/(2*Math.max(volume.width, Math.max(volume.height, volume.depth)))
+            property int mode: 2
+            property double iso: 0.5
+            property int transferFunction: 3
             property UniformStruct light: UniformStruct {
                 property vector3d position: light.position
                 property color color: light.color

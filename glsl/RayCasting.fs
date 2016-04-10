@@ -14,8 +14,9 @@ struct Light
 uniform Light light;
 uniform vec3 viewer;
 
-uniform int mode; // 0: iso, 1: maximum
+uniform int mode; // 0: iso, 1: maximum, 2: DVR
 uniform float iso;
+uniform sampler1D transferFunction;
 
 in vec3 fs_rayExit;
 out vec4 out_color;
@@ -128,6 +129,16 @@ Ray maximumIntensityStep(float value, Ray ray)
     return ray;
 }
 
+Ray directVolumeRenderingStep(float value, Ray ray)
+{
+    vec4 color = texture(transferFunction, value);
+    ray.color.rgb = ray.color.rgb + (1 - ray.color.a)*color.rgb*color.a;
+    ray.color.a = ray.color.a + (1 - ray.color.a)*color.a;
+    if(ray.color.a >= 1.0)
+        ray.terminate = true;
+    return ray;
+}
+
 void main()
 {
     vec3 rayEnter = texture(rayEntryTex, gl_FragCoord.xy/textureSize(rayEntryTex, 0)).rgb;
@@ -151,6 +162,8 @@ void main()
             ray = isoSurfaceStep(value, ray);
         else if(mode == 1)
             ray = maximumIntensityStep(value, ray);
+        else if(mode == 2)
+            ray = directVolumeRenderingStep(value, ray);
 
         if(ray.terminate)
             break;
