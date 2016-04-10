@@ -48,6 +48,7 @@ set(SOURCES
     src/ClearFramebuffer.cpp
     src/Uniforms.cpp
     src/BindTexture.cpp
+    src/PopOver.cpp
 )
 
 set(HEADERS
@@ -71,6 +72,7 @@ set(HEADERS
     include/ClearFramebuffer.h
     include/Uniforms.h
     include/BindTexture.h
+    include/PopOver.h
 )
 
 set(QML
@@ -78,7 +80,6 @@ set(QML
     qml/VolumeRenderer.qml
     qml/TransferFunctionEditor.qml
     qml/PopupMenu.qml
-    qml/PopupMenu.js
 )
 
 qt5_add_resources(RESOURCES qml.qrc)

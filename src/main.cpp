@@ -20,6 +20,7 @@
 #include "ClearFramebuffer.h"
 #include "Uniforms.h"
 #include "BindTexture.h"
+#include "PopOver.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -49,6 +50,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
     qmlRegisterType<UniformStruct>("UniformStruct", 1, 0, "UniformStruct");
     qmlRegisterType<BindTexture>("BindTexture", 1, 0, "BindTexture");
+
+    qmlRegisterType<PopOver>("PopOver", 1, 0, "PopOver");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));

@@ -1,5 +1,4 @@
 import QtQuick 2.0
-import "PopupMenu.js" as PopupMenu
 
 Item {
 
@@ -205,8 +204,14 @@ Item {
 
                         onClicked: {
                             if(!moved) {
-                                var menu = PopupMenu.create(x+width/2, y+height/2, this, colorPicker)
-                                menu.finished.connect(function(result) {
+                                var component = Qt.createComponent("PopupMenu.qml")
+                                var popup = component.createObject(null)
+                                popup.content.sourceComponent = colorPicker
+                                popup.parentItem = this
+                                popup.origin = Qt.point(x+width/2, y+width/2)
+                                popup.show()
+
+                                popup.finished.connect(function(result) {
                                     model.color = result
                                 });
                             }

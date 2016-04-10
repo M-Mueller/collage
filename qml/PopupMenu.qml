@@ -1,13 +1,9 @@
 import QtQuick 2.0
 import QtQuick.Window 2.1
+import PopOver 1.0
 
-Window {
+PopOver {
     id: popup
-
-    flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground
-    color: "#00000000"
-    visible: true
-    modality: Qt.NonModal
 
     width: 200
     height: 300
@@ -15,18 +11,10 @@ Window {
     // emitted with the selected result
     signal finished(var result)
 
-    onActiveChanged: {
-        // close when losing focus
-        if(!active) {
-            close()
-        }
-    }
-
     onFinished: {
         close()
     }
 
-    property int originX: width/2
     property alias margin: canvas.margin
     property alias content: content
 
@@ -44,9 +32,9 @@ Window {
 
             ctx.beginPath()
             ctx.moveTo(margin, height-2*margin)
-            ctx.lineTo(originX-5, height-2*margin)
-            ctx.lineTo(originX, height)
-            ctx.lineTo(originX+5, height-2*margin)
+            ctx.lineTo(width/2-5, height-2*margin)
+            ctx.lineTo(width/2, height)
+            ctx.lineTo(width/2+5, height-2*margin)
             ctx.lineTo(width-2*margin, height-2*margin)
             ctx.lineTo(width-2*margin, margin)
             ctx.lineTo(margin, margin)
