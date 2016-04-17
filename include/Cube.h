@@ -3,7 +3,11 @@
 
 #include "Entity.h"
 #include "RendererProperty.h"
+
 #include <QtGui/QMatrix4x4>
+#include <QtGui/QVector3D>
+
+#include <memory>
 
 class GlVertexArray;
 class GlVertexBuffer;
@@ -12,7 +16,7 @@ class Cube : public Entity
 {
     Q_OBJECT
     Q_PROPERTY(CullMode cullMode READ cullMode WRITE setCullMode)
-    Q_PROPERTY(QMatrix4x4 modelMatrix READ modelMatrix WRITE setModelMatrix)
+    Q_PROPERTY(QVector3D size READ size WRITE setSize NOTIFY sizeChanged)
 
 public:
     enum CullMode
@@ -30,21 +34,22 @@ public:
     void render(GlProgram& program) override;
 
     CullMode cullMode() const;
-    QMatrix4x4 modelMatrix() const;
-
-    QVector3D worldToVoxel(const QVector3D& world) const;
+    QVector3D size() const;
 
 public slots:
     void setCullMode(const CullMode& cullMode);
-    void setModelMatrix(const QMatrix4x4& modelMatrix);
+    void setSize(QVector3D size);
+
+signals:
+    void sizeChanged(QVector3D size);
 
 private:
-    GlVertexArray* _vao;
-    GlVertexBuffer* _vbo;
-    GlIndexBuffer* _ibo;
+    std::unique_ptr<GlVertexArray> _vao;
+    std::unique_ptr<GlVertexBuffer> _vbo;
+    std::unique_ptr<GlIndexBuffer> _ibo;
 
     RendererProperty<CullMode> _cullMode;
-    RendererProperty<QMatrix4x4, glm::mat4> _modelMatrix;
+    QVector3D _size;
 };
 
 #endif // CUBE_H

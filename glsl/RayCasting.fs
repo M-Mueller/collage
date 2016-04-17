@@ -4,6 +4,8 @@ uniform mat4 modelMatrix = mat4(1.0);
 
 uniform sampler2D rayEntryTex;
 uniform sampler3D volume;
+uniform vec3 volumeSize;
+uniform vec3 volumeSpacing;
 uniform float step;
 
 struct Light
@@ -34,18 +36,21 @@ struct Ray
     float maximum;
 };
 
+vec3 worldToVoxel(vec3 world)
+{
+    return (world/(volumeSize*volumeSpacing) + vec3(1.0))/2.0;
+}
+
 vec3 computePhongShading(vec3 pos, vec3 normal)
 {
-    vec3 worldPos = (modelMatrix * vec4(pos - vec3(0.5), 1.0)).xyz;
-    vec3 worldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
-    vec3 toViewer = normalize(viewer - worldPos);
-    vec3 toLight = normalize(light.position - worldPos);
+    vec3 toViewer = normalize(viewer - pos);
+    vec3 toLight = normalize(light.position - pos);
     float distance = length(toLight);
     vec3 halfNormal = (toViewer + toLight)/2.0;
-    float HdotN = clamp(dot(halfNormal, worldNormal), 0, 1);
+    float HdotN = clamp(dot(halfNormal, normal), 0, 1);
 
     vec3 ambient = vec3(0.05, 0.05, 0.05) * light.color.rgb;
-    vec3 diffuse = light.color.rgb * light.color.a * dot(toLight, worldNormal)/(distance*distance);
+    vec3 diffuse = light.color.rgb * light.color.a * dot(toLight, normal)/(distance*distance);
     vec3 specular = light.color.rgb * light.color.a * pow(HdotN, 100);
 
     return ambient + diffuse + specular;
@@ -54,38 +59,38 @@ vec3 computePhongShading(vec3 pos, vec3 normal)
 vec3 computeNormal(vec3 pos)
 {
     vec4 offset = vec4(vec3(step), 0);
-    float dx = texture(volume, pos.rgb - offset.xww).r - texture(volume, pos.rgb + offset.xww).r;
-    float dy = texture(volume, pos.rgb - offset.wyw).r - texture(volume, pos.rgb + offset.wyw).r;
-    float dz = texture(volume, pos.rgb - offset.wwz).r - texture(volume, pos.rgb + offset.wwz).r;
+    float dx = texture(volume, worldToVoxel(pos.rgb - offset.xww)).r - texture(volume, worldToVoxel(pos.rgb + offset.xww)).r;
+    float dy = texture(volume, worldToVoxel(pos.rgb - offset.wyw)).r - texture(volume, worldToVoxel(pos.rgb + offset.wyw)).r;
+    float dz = texture(volume, worldToVoxel(pos.rgb - offset.wwz)).r - texture(volume, worldToVoxel(pos.rgb + offset.wwz)).r;
     return normalize(vec3(dx/2, dy/2, dz/2));
 }
 
 bool computeShadow(vec3 pos)
 {
     // perform iso raycasting from position to light
-    vec3 lightWorld = (inverse(modelMatrix)*vec4(light.position, 1.0)).xyz;
     Ray ray;
     ray.position = pos;
-    ray.direction = normalize(lightWorld - pos);
+    ray.direction = normalize(light.position - pos);
     ray.terminate = false;
 
     float shadowStep = 2*step; // no accurate hit required
     // start one step away from the already hit iso surface
     ray.position += shadowStep*ray.direction;
 
-    for(int i=0; i<4096; ++i)
+    int numSteps = int(length(light.position - pos)/shadowStep);
+    for(int i=0; i<numSteps; ++i)
     {
-        // FIXME: because of floating point errors, the first step is sometimes skipped
-        if(i > 0 && (any(lessThan(ray.position, vec3(0.0))) || any(greaterThan(ray.position, vec3(1.0)))))
+        vec3 voxelPos = worldToVoxel(ray.position);
+        if(any(lessThan(voxelPos, vec3(0.0))) || any(greaterThan(voxelPos, vec3(1.0))))
             return false;
 
-        float value = texture(volume, ray.position).r;
+        float value = texture(volume, voxelPos).r;
         if(value >= iso)
             return true;
 
         ray.position += shadowStep*ray.direction;
     }
-    out_color = ray.color;
+    return false;
 }
 
 Ray isoSurfaceStep(float value, Ray ray)
@@ -96,7 +101,7 @@ Ray isoSurfaceStep(float value, Ray ray)
         for(int i=1; i<6; ++i)
         {
             ray.position += refinementDir*step/(pow(2, i)) * ray.direction;
-            float refinedValue = texture(volume, ray.position.rgb).r;
+            float refinedValue = texture(volume, worldToVoxel(ray.position)).r;
             if(refinedValue > iso)
                 refinementDir = -1;
             else if(refinedValue < iso)
@@ -151,13 +156,10 @@ void main()
     ray.terminate = false;
     ray.maximum = 0.0;
 
-    for(int i=0; i<4096; ++i)
+    int numSteps = int(length(rayExit - rayEnter)/step);
+    for(int i=0; i<numSteps; ++i)
     {
-        // FIXME: because of floating point errors, the first step is sometimes skipped
-        if(i > 0 && (any(lessThan(ray.position, vec3(0.0))) || any(greaterThan(ray.position, vec3(1.0)))))
-            break;
-
-        float value = texture(volume, ray.position).r;
+        float value = texture(volume, worldToVoxel(ray.position)).r;
         if(mode == 0)
             ray = isoSurfaceStep(value, ray);
         else if(mode == 1)

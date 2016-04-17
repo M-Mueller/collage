@@ -24,7 +24,7 @@ add_subdirectory(glue)
 # enable Easylogging Qt support
 add_definitions(-DELPP_QT_LOGGING)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
@@ -43,7 +43,6 @@ set(SOURCES
     src/TurnTableCamera.cpp
     src/Entity.cpp
     src/Rectangle.cpp
-    src/NearClippingRectangle.cpp
     src/Cube.cpp
     src/ClearFramebuffer.cpp
     src/Uniforms.cpp
@@ -67,7 +66,6 @@ set(HEADERS
     include/TurnTableCamera.h
     include/Entity.h
     include/Rectangle.h
-    include/NearClippingRectangle.h
     include/Cube.h
     include/ClearFramebuffer.h
     include/Uniforms.h

@@ -15,7 +15,6 @@
 #include "TurnTableCamera.h"
 #include "Entity.h"
 #include "Rectangle.h"
-#include "NearClippingRectangle.h"
 #include "Cube.h"
 #include "ClearFramebuffer.h"
 #include "Uniforms.h"
@@ -44,7 +43,6 @@ int main(int argc, char *argv[])
 
     qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
-    qmlRegisterType<NearClippingRectangle>("NearClippingRectangle", 1, 0, "NearClippingRectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
     qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
     qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");

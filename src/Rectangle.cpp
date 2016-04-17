@@ -7,64 +7,53 @@
 
 Rectangle::Rectangle(QObject* parent):
     Entity(parent),
+    _position0(-1.0f, -1.0f, 0.0f),
+    _position1(1.0f, -1.0f, 0.0f),
+    _position2(1.0f, 1.0f, 0.0f),
+    _position3(-1.0f, 1.0f, 0.0f),
     _color0(1.0f, 1.0f, 1.0f),
     _color1(1.0f, 1.0f, 1.0f),
     _color2(1.0f, 1.0f, 1.0f),
     _color3(1.0f, 1.0f, 1.0f),
-    _texCoord0(0.0f, 0.0f, 0.0f),
-    _texCoord1(1.0f, 0.0f, 0.0f),
-    _texCoord2(1.0f, 1.0f, 0.0f),
-    _texCoord3(0.0f, 1.0f, 0.0f),
-    _update(true),
-    _vao(0),
-    _vbo(0),
-    _ibo(0)
+    _update(true)
 {
 
 }
 
 Rectangle::~Rectangle()
 {
-    delete _vao;
-    delete _vbo;
-    delete _ibo;
+
 }
 
 void Rectangle::synchronize()
 {
     if(!_vbo && !_vao && !_ibo)
     {
-        _vbo = new GlVertexBuffer;
-        _ibo = new GlIndexBuffer;
-        _vao = new GlVertexArray;
+        _vbo = std::make_unique<GlVertexBuffer>();
+        _ibo = std::make_unique<GlIndexBuffer>();
+        _vao = std::make_unique<GlVertexArray>();
     }
 
     if(_update)
     {
-        std::vector<glm::vec2> vertices = {
-            glm::vec2(-1.0f, -1.0f),
-            glm::vec2(1.0f, -1.0f),
-            glm::vec2(1.0f, 1.0f),
-            glm::vec2(-1.0f, 1.0f)
+        std::vector<QVector3D> vertices = {
+            _position0,
+            _position1,
+            _position2,
+            _position3
         };
-        std::vector<glm::vec3> colors = {
-            glm::vec3(_color0.x(), _color0.y(), _color0.z()),
-            glm::vec3(_color1.x(), _color1.y(), _color1.z()),
-            glm::vec3(_color2.x(), _color2.y(), _color2.z()),
-            glm::vec3(_color3.x(), _color3.y(), _color3.z())
-        };
-        std::vector<glm::vec3> texCoords = {
-            glm::vec3(_texCoord0.x(), _texCoord0.y(), _texCoord0.z()),
-            glm::vec3(_texCoord1.x(), _texCoord1.y(), _texCoord1.z()),
-            glm::vec3(_texCoord2.x(), _texCoord2.y(), _texCoord2.z()),
-            glm::vec3(_texCoord3.x(), _texCoord3.y(), _texCoord3.z())
+        std::vector<QVector3D> colors = {
+            _color0,
+            _color1,
+            _color2,
+            _color3,
         };
         std::vector<unsigned int> indices = {
             0, 1, 2,
             2, 3, 0
         };
         _vbo->bind();
-        _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, colors, texCoords);
+        _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, colors);
 
         _ibo->bind();
         _ibo->setData(GlBuffer::Usage::StaticDraw, indices);
@@ -93,48 +82,24 @@ void Rectangle::updateBuffers()
     _update = true;
 }
 
-QVector3D Rectangle::texCoord3() const
+QVector3D Rectangle::position0() const
 {
-    return _texCoord3;
+    return _position0;
 }
 
-void Rectangle::setTexCoord3(const QVector3D& texCoord3)
+QVector3D Rectangle::position1() const
 {
-    _texCoord3 = texCoord3;
-    updateBuffers();
+    return _position1;
 }
 
-QVector3D Rectangle::texCoord2() const
+QVector3D Rectangle::position2() const
 {
-    return _texCoord2;
+    return _position2;
 }
 
-void Rectangle::setTexCoord2(const QVector3D& texCoord2)
+QVector3D Rectangle::position3() const
 {
-    _texCoord2 = texCoord2;
-    updateBuffers();
-}
-
-QVector3D Rectangle::texCoord1() const
-{
-    return _texCoord1;
-}
-
-void Rectangle::setTexCoord1(const QVector3D& texCoord1)
-{
-    _texCoord1 = texCoord1;
-    updateBuffers();
-}
-
-QVector3D Rectangle::texCoord0() const
-{
-    return _texCoord0;
-}
-
-void Rectangle::setTexCoord0(const QVector3D& texCoord0)
-{
-    _texCoord0 = texCoord0;
-    updateBuffers();
+    return _position3;
 }
 
 QVector3D Rectangle::color0() const
@@ -142,21 +107,9 @@ QVector3D Rectangle::color0() const
     return _color0;
 }
 
-void Rectangle::setColor0(const QVector3D& color0)
-{
-    _color0 = color0;
-    updateBuffers();
-}
-
 QVector3D Rectangle::color1() const
 {
     return _color1;
-}
-
-void Rectangle::setColor1(const QVector3D& color1)
-{
-    _color1 = color1;
-    updateBuffers();
 }
 
 QVector3D Rectangle::color2() const
@@ -164,20 +117,88 @@ QVector3D Rectangle::color2() const
     return _color2;
 }
 
-void Rectangle::setColor2(const QVector3D& color2)
-{
-    _color2 = color2;
-    updateBuffers();
-}
-
 QVector3D Rectangle::color3() const
 {
     return _color3;
 }
 
-void Rectangle::setColor3(const QVector3D& color3)
+void Rectangle::setPosition0(QVector3D position0)
 {
+    if (_position0 == position0)
+        return;
+
+    _position0 = position0;
+    emit position0Changed(position0);
+    updateBuffers();
+}
+
+void Rectangle::setPosition1(QVector3D position1)
+{
+    if (_position1 == position1)
+        return;
+
+    _position1 = position1;
+    emit position1Changed(position1);
+    updateBuffers();
+}
+
+void Rectangle::setPosition2(QVector3D position2)
+{
+    if (_position2 == position2)
+        return;
+
+    _position2 = position2;
+    emit position2Changed(position2);
+    updateBuffers();
+}
+
+void Rectangle::setPosition3(QVector3D position3)
+{
+    if (_position3 == position3)
+        return;
+
+    _position3 = position3;
+    emit position3Changed(position3);
+    updateBuffers();
+}
+
+void Rectangle::setColor0(QVector3D color0)
+{
+    if (_color0 == color0)
+        return;
+
+    _color0 = color0;
+    emit color0Changed(color0);
+    updateBuffers();
+}
+
+void Rectangle::setColor1(QVector3D color1)
+{
+    if (_color1 == color1)
+        return;
+
+    _color1 = color1;
+    emit color1Changed(color1);
+    updateBuffers();
+}
+
+void Rectangle::setColor2(QVector3D color2)
+{
+    if (_color2 == color2)
+        return;
+
+    _color2 = color2;
+    emit color2Changed(color2);
+    updateBuffers();
+}
+
+void Rectangle::setColor3(QVector3D color3)
+{
+    if (_color3 == color3)
+        return;
+
     _color3 = color3;
+    emit color3Changed(color3);
     updateBuffers();
 }
 

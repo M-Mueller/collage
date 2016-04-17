@@ -11,26 +11,24 @@
 
 Cube::Cube(QObject* parent):
     Entity(parent),
-    _vao(nullptr),
-    _vbo(nullptr),
-    _ibo(nullptr),
     _cullMode(None),
-    _modelMatrix()
+    _size(1.0, 1.0, 1.0)
 {
 
 }
 
 Cube::~Cube()
 {
-    delete _vao;
-    delete _vbo;
-    delete _ibo;
 }
 
 void Cube::synchronize()
 {
     if(!_vbo && !_vao && !_ibo)
     {
+        _vao = nullptr;
+        _vbo = nullptr;
+        _ibo = nullptr;
+
         //     3.+------+ 2
         //    .' |    .'|
         // 7 +---+--+'6 |
@@ -38,26 +36,26 @@ void Cube::synchronize()
         //   | 0,+--+---+ 1
         //   |.'    | .'
         // 4 +------+'5
-        std::vector<glm::vec3> vertices = {
-           glm::vec3(-1.0f, -1.0f, -1.0f),
-           glm::vec3(1.0f, -1.0f, -1.0f),
-           glm::vec3(1.0f, 1.0f, -1.0f),
-           glm::vec3(-1.0f, 1.0f, -1.0f),
-           glm::vec3(-1.0f, -1.0f, 1.0f),
-           glm::vec3(1.0f, -1.0f, 1.0f),
-           glm::vec3(1.0f, 1.0f, 1.0f),
-           glm::vec3(-1.0f, 1.0f, 1.0f)
+        std::vector<QVector3D> vertices = {
+           _size*QVector3D(-1.0f, -1.0f, -1.0f),
+           _size*QVector3D(1.0f, -1.0f, -1.0f),
+           _size*QVector3D(1.0f, 1.0f, -1.0f),
+           _size*QVector3D(-1.0f, 1.0f, -1.0f),
+           _size*QVector3D(-1.0f, -1.0f, 1.0f),
+           _size*QVector3D(1.0f, -1.0f, 1.0f),
+           _size*QVector3D(1.0f, 1.0f, 1.0f),
+           _size*QVector3D(-1.0f, 1.0f, 1.0f)
         };
 
-        std::vector<glm::vec3> colors = {
-           glm::vec3(0.0f, 0.0f, 0.0f),
-           glm::vec3(1.0f, 0.0f, 0.0f),
-           glm::vec3(1.0f, 1.0f, 0.0f),
-           glm::vec3(0.0f, 1.0f, 0.0f),
-           glm::vec3(0.0f, 0.0f, 1.0f),
-           glm::vec3(1.0f, 0.0f, 1.0f),
-           glm::vec3(1.0f, 1.0f, 1.0f),
-           glm::vec3(0.0f, 1.0f, 1.0f)
+        std::vector<QVector3D> colors = {
+           QVector3D(0.0f, 0.0f, 0.0f),
+           QVector3D(1.0f, 0.0f, 0.0f),
+           QVector3D(1.0f, 1.0f, 0.0f),
+           QVector3D(0.0f, 1.0f, 0.0f),
+           QVector3D(0.0f, 0.0f, 1.0f),
+           QVector3D(1.0f, 0.0f, 1.0f),
+           QVector3D(1.0f, 1.0f, 1.0f),
+           QVector3D(0.0f, 1.0f, 1.0f)
         };
 
         std::vector<unsigned short> indices = {
@@ -77,9 +75,9 @@ void Cube::synchronize()
 
         try
         {
-            _vao = new GlVertexArray;
-            _vbo = new GlVertexBuffer;
-            _ibo = new GlIndexBuffer;
+            _vao = std::make_unique<GlVertexArray>();
+            _vbo = std::make_unique<GlVertexBuffer>();
+            _ibo = std::make_unique<GlIndexBuffer>();
 
             _vbo->bind();
             _vbo->setData(GlBuffer::Usage::StaticDraw, vertices, colors);
@@ -97,33 +95,15 @@ void Cube::synchronize()
         }
         catch(...)
         {
-            if(_vao)
-            {
-                _vao->release();
-                delete _vao;
-                _vao = nullptr;
-            }
-
-            if(_vbo)
-            {
-                _vbo->release();
-                delete _vbo;
-                _vbo = nullptr;
-            }
-
-            if(_ibo)
-            {
-                _ibo->release();
-                delete _ibo;
-                _ibo = nullptr;
-            }
+            _vao = nullptr;
+            _vbo = nullptr;
+            _ibo = nullptr;
         }
     }
     _cullMode.synchronize();
-    _modelMatrix.synchronize();
 }
 
-void Cube::render(GlProgram& program)
+void Cube::render(GlProgram&)
 {
     if(_cullMode.gl() != None)
     {
@@ -133,8 +113,6 @@ void Cube::render(GlProgram& program)
         else
             glCullFace(GL_BACK);
     }
-
-    program.setUniform("modelMatrix", _modelMatrix.gl());
 
     if(_vao)
     {
@@ -159,19 +137,17 @@ void Cube::setCullMode(const CullMode& cullMode)
     _cullMode = cullMode;
 }
 
-QMatrix4x4 Cube::modelMatrix() const
+QVector3D Cube::size() const
 {
-    return _modelMatrix;
+    return _size;
 }
 
-QVector3D Cube::worldToVoxel(const QVector3D& world) const
+void Cube::setSize(QVector3D size)
 {
-    QMatrix4x4 inverted = _modelMatrix.value.inverted();
-    return (inverted * world + QVector3D(1, 1, 1))/2;
-}
+    if (_size == size)
+        return;
 
-void Cube::setModelMatrix(const QMatrix4x4& modelMatrix)
-{
-    _modelMatrix = modelMatrix;
+    _size = size;
+    emit sizeChanged(size);
 }
 

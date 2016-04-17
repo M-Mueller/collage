@@ -11,7 +11,6 @@ import Framebuffer 1.0
 import RenderBuffer 1.0
 import TurnTableCamera 1.0
 import Rectangle 1.0
-import NearClippingRectangle 1.0
 import Cube 1.0
 import ClearFramebuffer 1.0
 import Uniforms 1.0
@@ -62,9 +61,11 @@ VisualizationFramebuffer {
         aspectRatio: vis.width/vis.height
         radius: 100
 
+        property matrix4x4 invViewProjMatrix: viewMatrix.inverted().times(projectionMatrix.inverted())
+
         function center() {
-            var invModelView = camera.viewMatrix.inverted()
-            return invModelView.times(Qt.vector3d(0, 0, 0))
+            var invView = camera.viewMatrix.inverted()
+            return invView.times(Qt.vector3d(0, 0, 0))
         }
     }
 
@@ -97,12 +98,12 @@ VisualizationFramebuffer {
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayEntryPointsPass
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/Cube.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/Cube.fs"
+        vertexShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.vs"
+        fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.fs"
 
         viewport: Qt.rect(0, 0, vis.width, vis.height)
 
-        depthTest: true
+        depthTest: false
 
         renderToTexture: Framebuffer {
             colorAttachment0: Texture2D {
@@ -119,30 +120,39 @@ VisualizationFramebuffer {
             }
         }
 
-        Uniforms {
-            property matrix4x4 viewMatrix: camera.viewMatrix
-            property matrix4x4 projectionMatrix: camera.projectionMatrix
-        }
-
         ClearFramebuffer {
             clearColorBuffer: true
             clearDepthBuffer: true
         }
 
-        // first render the nearclipping plane as fallback position if the camera is inside the cube
-        NearClippingRectangle {
-            camera: camera
-            cube: volumeProxy
+        // first render the near clipping plane as fallback position if the camera is inside the cube
+        Uniforms {
+            property matrix4x4 viewMatrix: Qt.matrix4x4()
+            property matrix4x4 projectionMatrix: Qt.matrix4x4()
+            // encode the position in the color attribute
+            property bool usePositionAsColor: false
+        }
+
+        Rectangle {
+            // convert from clip to world coordinates
+            color0: camera.invViewProjMatrix.times(Qt.vector3d(-1, -1, -1))
+            color1: camera.invViewProjMatrix.times(Qt.vector3d(1, -1, -1))
+            color2: camera.invViewProjMatrix.times(Qt.vector3d(1, 1, -1))
+            color3: camera.invViewProjMatrix.times(Qt.vector3d(-1, 1, -1))
         }
 
         // render the frontfaces of the cube
+        Uniforms {
+            property matrix4x4 viewMatrix: camera.viewMatrix
+            property matrix4x4 projectionMatrix: camera.projectionMatrix
+            property bool usePositionAsColor: true
+        }
+
         Cube {
-            id: volumeProxy
             cullMode: Cube.Back
-            modelMatrix: Qt.matrix4x4(volume.width*volume.spacing.x, 0, 0, 0,
-                                      0, volume.height*volume.spacing.y, 0, 0,
-                                      0, 0, volume.depth*volume.spacing.z, 0,
-                                      0, 0, 0, 1)
+            size: Qt.vector3d(volume.width*volume.spacing.x,
+                              volume.height*volume.spacing.y,
+                              volume.depth*volume.spacing.z)
         }
     }
 
@@ -174,12 +184,19 @@ VisualizationFramebuffer {
             id: raycastingUniforms
             property matrix4x4 viewMatrix: camera.viewMatrix
             property matrix4x4 projectionMatrix: camera.projectionMatrix
+
             property int rayEntryTex: 1
+
             property int volume: 2
-            property double step: 1.0/(2*Math.max(volume.width, Math.max(volume.height, volume.depth)))
+            property vector3d volumeSize: Qt.vector3d(volume.width, volume.height, volume.depth)
+            property vector3d volumeSpacing: volume.spacing
+
+            property double step: 0.5*(Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z)))
+
             property int mode: 2
             property double iso: 0.5
             property int transferFunction: 3
+
             property UniformStruct light: UniformStruct {
                 property vector3d position: light.position
                 property color color: light.color
@@ -195,7 +212,9 @@ VisualizationFramebuffer {
         // render only the backfaces of the cube as exit positions for the rays
         Cube {
             cullMode: Cube.Front
-            modelMatrix: volumeProxy.modelMatrix
+            size: Qt.vector3d(volume.width*volume.spacing.x,
+                              volume.height*volume.spacing.y,
+                              volume.depth*volume.spacing.z)
         }
     }
 }
