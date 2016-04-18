@@ -41,7 +41,7 @@ vec3 worldToVoxel(vec3 world)
     return (world/(volumeSize*volumeSpacing) + vec3(1.0))/2.0;
 }
 
-vec3 computePhongShading(vec3 pos, vec3 normal)
+vec3 computePhongShading(vec3 pos, vec3 normal, vec3 color)
 {
     vec3 toViewer = normalize(viewer - pos);
     vec3 toLight = normalize(light.position - pos);
@@ -49,11 +49,11 @@ vec3 computePhongShading(vec3 pos, vec3 normal)
     vec3 halfNormal = (toViewer + toLight)/2.0;
     float HdotN = clamp(dot(halfNormal, normal), 0, 1);
 
-    vec3 ambient = vec3(0.05, 0.05, 0.05) * light.color.rgb;
+    vec3 ambient = vec3(0.1, 0.1, 0.1) * light.color.rgb;
     vec3 diffuse = light.color.rgb * light.color.a * dot(toLight, normal)/(distance*distance);
     vec3 specular = light.color.rgb * light.color.a * pow(HdotN, 100);
 
-    return ambient + diffuse + specular;
+    return color*ambient + color*diffuse + color*specular;
 }
 
 vec3 computeNormal(vec3 pos)
@@ -62,7 +62,12 @@ vec3 computeNormal(vec3 pos)
     float dx = texture(volume, worldToVoxel(pos.rgb - offset.xww)).r - texture(volume, worldToVoxel(pos.rgb + offset.xww)).r;
     float dy = texture(volume, worldToVoxel(pos.rgb - offset.wyw)).r - texture(volume, worldToVoxel(pos.rgb + offset.wyw)).r;
     float dz = texture(volume, worldToVoxel(pos.rgb - offset.wwz)).r - texture(volume, worldToVoxel(pos.rgb + offset.wwz)).r;
-    return normalize(vec3(dx/2, dy/2, dz/2));
+    vec3 normal = vec3(dx/2, dy/2, dz/2);
+    float norm = length(normal);
+    if(norm != 0.0)
+        return normal/norm;
+    else
+        return vec3(0.0);
 }
 
 bool computeShadow(vec3 pos)
@@ -111,9 +116,9 @@ Ray isoSurfaceStep(float value, Ray ray)
         }
 
         vec3 normal = computeNormal(ray.position);
-        ray.color = vec4(computePhongShading(ray.position, normal), 1.0);
+        ray.color.rgb = computePhongShading(ray.position, normal, vec3(1.0));
         if(computeShadow(ray.position))
-            ray.color.xyz *= 0.1;
+            ray.color.rgb *= 0.1;
         ray.terminate = true;
     }
     else
@@ -137,8 +142,12 @@ Ray maximumIntensityStep(float value, Ray ray)
 Ray directVolumeRenderingStep(float value, Ray ray)
 {
     vec4 color = texture(transferFunction, value);
+    vec3 normal = computeNormal(ray.position);
+    color.rgb = computePhongShading(ray.position, normal, color.rgb);
+
     ray.color.rgb = ray.color.rgb + (1 - ray.color.a)*color.rgb*color.a;
     ray.color.a = ray.color.a + (1 - ray.color.a)*color.a;
+
     if(ray.color.a >= 1.0)
         ray.terminate = true;
     return ray;
@@ -172,5 +181,5 @@ void main()
 
         ray.position += step*ray.direction;
     }
-    out_color = ray.color;
+    out_color = clamp(ray.color, vec4(0.0), vec4(1.0));
 }
