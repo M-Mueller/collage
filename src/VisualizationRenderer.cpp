@@ -5,9 +5,12 @@
 #include "Texture2D.h"
 
 #include <glad/glad.h>
+#include <glue/GlQuery.h>
 
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtQuick/QQuickWindow>
+
+#include "easylogging++.h"
 
 VisualizationRenderer::VisualizationRenderer():
     m_item(nullptr)
@@ -53,10 +56,19 @@ void VisualizationRenderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
+    GlQuery query(GlQuery::Target::TimeElapsed);
+    double total = 0;
     for(auto pass: m_passes)
     {
+        query.begin();
         pass->render();
+        query.end();
+        double elapsed = static_cast<double>(query.retrieve())/1e6;
+        total += elapsed;
+        LOG(INFO) << pass->objectName() << " took " << elapsed << " ms";
     }
+
+    LOG(INFO) << "Rendering took " << total << " ms";
 
     glPopDebugGroup();
 

@@ -8,6 +8,9 @@ uniform vec3 volumeSize;
 uniform vec3 volumeSpacing;
 uniform float step;
 
+uniform float windowWidth;
+uniform float windowCenter;
+
 struct Light
 {
     vec3 position;
@@ -39,6 +42,15 @@ struct Ray
 vec3 worldToVoxel(vec3 world)
 {
     return (world/(volumeSize*volumeSpacing) + vec3(1.0))/2.0;
+}
+
+float getValue(vec3 position)
+{
+    float value = texture(volume, worldToVoxel(position)).r;
+    float left = (windowCenter - 0.5*windowWidth);
+    float right = (windowCenter + 0.5*windowWidth);
+    value = (value - left)/(right - left);
+    return clamp(value, 0.0, 1.0);
 }
 
 vec3 computePhongShading(vec3 pos, vec3 normal, vec3 color)
@@ -89,7 +101,7 @@ bool computeShadow(vec3 pos)
         if(any(lessThan(voxelPos, vec3(0.0))) || any(greaterThan(voxelPos, vec3(1.0))))
             return false;
 
-        float value = texture(volume, voxelPos).r;
+        float value = getValue(voxelPos);
         if(value >= iso)
             return true;
 
@@ -106,7 +118,7 @@ Ray isoSurfaceStep(float value, Ray ray)
         for(int i=1; i<6; ++i)
         {
             ray.position += refinementDir*step/(pow(2, i)) * ray.direction;
-            float refinedValue = texture(volume, worldToVoxel(ray.position)).r;
+            float refinedValue = getValue(ray.position);
             if(refinedValue > iso)
                 refinementDir = -1;
             else if(refinedValue < iso)
@@ -142,8 +154,11 @@ Ray maximumIntensityStep(float value, Ray ray)
 Ray directVolumeRenderingStep(float value, Ray ray)
 {
     vec4 color = texture(transferFunction, value);
-    vec3 normal = computeNormal(ray.position);
-    color.rgb = computePhongShading(ray.position, normal, color.rgb);
+    if(mode == 3)
+    {
+        vec3 normal = computeNormal(ray.position);
+        color.rgb = computePhongShading(ray.position, normal, color.rgb);
+    }
 
     ray.color.rgb = ray.color.rgb + (1 - ray.color.a)*color.rgb*color.a;
     ray.color.a = ray.color.a + (1 - ray.color.a)*color.a;
@@ -168,12 +183,12 @@ void main()
     int numSteps = int(length(rayExit - rayEnter)/step);
     for(int i=0; i<numSteps; ++i)
     {
-        float value = texture(volume, worldToVoxel(ray.position)).r;
+        float value = getValue(ray.position);
         if(mode == 0)
             ray = isoSurfaceStep(value, ray);
         else if(mode == 1)
             ray = maximumIntensityStep(value, ray);
-        else if(mode == 2)
+        else if(mode >= 2)
             ray = directVolumeRenderingStep(value, ray);
 
         if(ray.terminate)

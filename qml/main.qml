@@ -33,7 +33,7 @@ ApplicationWindow {
         anchors.rightMargin: 0
         anchors.top: parent.top
         anchors.topMargin: 0
-        anchors.left: column1.right
+        anchors.left: gridLayout1.right
         anchors.leftMargin: 0
     }
 
@@ -45,7 +45,7 @@ ApplicationWindow {
         anchors.rightMargin: 0
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
-        anchors.left: column1.right
+        anchors.left: gridLayout1.right
         anchors.leftMargin: 0
 
         onTransferFunctionChanged: {
@@ -55,20 +55,25 @@ ApplicationWindow {
         }
     }
 
-    Column {
-        id: column1
-        width: 200
+    GridLayout {
+        id: gridLayout1
+        width: 194
+        columnSpacing: 5
+        rowSpacing: 5
+        rows: 3
+        columns: 2
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         anchors.top: parent.top
         anchors.topMargin: 0
-        spacing: 9
 
         Button {
             id: reloadShaders
             text: qsTr("Reload Shaders")
+
+            Layout.columnSpan: 2
 
             onClicked: {
                 volumeRenderer.reloadShaders()
@@ -76,18 +81,52 @@ ApplicationWindow {
             }
         }
 
+        Label {
+            color: "#ffffff"
+            text: qsTr("Mode:")
+        }
+
         SpinBox {
             minimumValue: 0
-            maximumValue: 2
+            maximumValue: 3
             value: volumeRenderer.mode
 
             onValueChanged: {
-                tfEditor.visible = value == 2
+                tfEditor.visible = value >= 2
                 volumeRenderer.mode = value
                 volumeRenderer.update()
             }
         }
 
+        Label {
+            color: "#ffffff"
+            text: qsTr("Window Width:")
+        }
+
+        SpinBox {
+            id: windowWidthSpinBox
+            stepSize: 0.1
+            decimals: 2
+            minimumValue: 0.0
+            maximumValue: 1.0
+            value: volumeRenderer.windowWidth
+            onValueChanged: volumeRenderer.windowWidth = value
+        }
+
+        Label {
+            color: "#ffffff"
+            text: qsTr("Window Center:")
+        }
+
+        SpinBox {
+            id: windowCenterSpinBox
+            stepSize: 0.1
+            decimals: 2
+            minimumValue: -1.0
+            maximumValue: 1.0
+            value: volumeRenderer.windowCenter
+            onValueChanged: volumeRenderer.windowCenter = value
+        }
     }
 
 }

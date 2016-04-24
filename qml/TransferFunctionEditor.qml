@@ -45,6 +45,23 @@ Item {
         transferFunctionChanged()
     }
 
+    function removeControlPoint(pos) {
+        if(pos === 0.0 || pos === 1.0)
+            return;
+
+        // find the current insertion index
+        // control points must be order by pos
+        for(var i=0; i<controlPoints.count; ++i) {
+            var point = controlPoints.get(i)
+            if(pos === point.pos)
+            {
+                controlPoints.remove(i)
+            }
+        }
+
+        transferFunctionChanged()
+    }
+
     function transferFunction (samples) {
         var tf = []
         var prevcp = 0
@@ -145,10 +162,33 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.SizeAllCursor
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                         property bool moved: false
 
-                        onPressed: moved = false
+                        onPressed: {
+                            if(mouse.button === Qt.LeftButton) {
+                                moved = false
+                            }
+                            else if (mouse.button === Qt.RightButton) {
+                                removeControlPoint(model.pos)
+                            }
+                        }
+
+                        onClicked: {
+                            if(!moved && mouse.button === Qt.LeftButton) {
+                                var component = Qt.createComponent("PopupMenu.qml")
+                                var popup = component.createObject(null)
+                                popup.content.sourceComponent = colorPicker
+                                popup.parentItem = this
+                                popup.origin = Qt.point(x+width/2, y+width/2)
+                                popup.show()
+
+                                popup.finished.connect(function(result) {
+                                    model.color = result
+                                });
+                            }
+                        }
 
                         onPositionChanged: {
                             // drag the point by changing the model
@@ -200,21 +240,6 @@ Item {
 									}
 								}
 							}
-						}
-
-                        onClicked: {
-                            if(!moved) {
-                                var component = Qt.createComponent("PopupMenu.qml")
-                                var popup = component.createObject(null)
-                                popup.content.sourceComponent = colorPicker
-                                popup.parentItem = this
-                                popup.origin = Qt.point(x+width/2, y+width/2)
-                                popup.show()
-
-                                popup.finished.connect(function(result) {
-                                    model.color = result
-                                });
-                            }
                         }
                     }
                 }

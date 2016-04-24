@@ -18,7 +18,7 @@ import UniformStruct 1.0
 import BindTexture 1.0
 
 VisualizationFramebuffer {
-    id: vis
+    id: volumeRenderer
 
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1} // flip the whole image
 
@@ -27,8 +27,14 @@ VisualizationFramebuffer {
         raycastingPass.reloadShaders()
     }
 
-    property alias mode: raycastingUniforms.mode
+    property int mode: 2
+    property double windowWidth: 1.0
+    property double windowCenter: 0.5
+
     property alias transferFunction: transferFunction
+
+    onWindowWidthChanged: update()
+    onWindowCenterChanged: update()
 
     QtQuick.MouseArea {
         anchors.fill: parent;
@@ -46,19 +52,19 @@ VisualizationFramebuffer {
             camera.theta -= (originY - mouse.y)*0.01
             originX = mouse.x
             originY = mouse.y
-            vis.update()
+            volumeRenderer.update()
         }
 
         onWheel: {
             camera.radius -= wheel.angleDelta.y/10
             wheel.accepted = true;
-            vis.update()
+            volumeRenderer.update()
         }
     }
 
     TurnTableCamera {
         id: camera
-        aspectRatio: vis.width/vis.height
+        aspectRatio: volumeRenderer.width/volumeRenderer.height
         radius: 100
 
         property matrix4x4 invViewProjMatrix: viewMatrix.inverted().times(projectionMatrix.inverted())
@@ -77,7 +83,8 @@ VisualizationFramebuffer {
 
     Texture3D {
         id: volume
-        source: "/home/markus/Data/Bucky.mhd"
+        //source: "/home/markus/Data/Bucky.mhd"
+        source: "/home/markus/Data/walnut.mhd"
     }
 
     Texture1D {
@@ -101,7 +108,7 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.fs"
 
-        viewport: Qt.rect(0, 0, vis.width, vis.height)
+        viewport: Qt.rect(0, 0, volumeRenderer.width, volumeRenderer.height)
 
         depthTest: false
 
@@ -109,14 +116,14 @@ VisualizationFramebuffer {
             colorAttachment0: Texture2D {
                 id: rayEntryTex
                 type: Texture2D.Float
-                width: vis.width
-                height: vis.height
+                width: volumeRenderer.width
+                height: volumeRenderer.height
                 channels: 4
             }
             depthAttachment: RenderBuffer {
                 type: Texture.Depth24
-                width: vis.width
-                height: vis.height
+                width: volumeRenderer.width
+                height: volumeRenderer.height
             }
         }
 
@@ -161,7 +168,7 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
 
-        viewport: Qt.rect(0, 0, vis.width, vis.height)
+        viewport: Qt.rect(0, 0, volumeRenderer.width, volumeRenderer.height)
 
         depthTest: true
 
@@ -191,9 +198,12 @@ VisualizationFramebuffer {
             property vector3d volumeSize: Qt.vector3d(volume.width, volume.height, volume.depth)
             property vector3d volumeSpacing: volume.spacing
 
-            property double step: 0.5*(Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z)))
+            property double step: Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z))
 
-            property int mode: 2
+            property double windowWidth: volumeRenderer.windowWidth
+            property double windowCenter: volumeRenderer.windowCenter
+
+            property int mode: volumeRenderer.mode
             property double iso: 0.5
             property int transferFunction: 3
 
