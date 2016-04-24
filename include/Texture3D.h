@@ -10,11 +10,12 @@ class GlTexture3D;
 class Texture3D: public Texture
 {
     Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setWidth)
-    Q_PROPERTY(int height READ height WRITE setHeight)
-    Q_PROPERTY(int depth READ depth WRITE setDepth)
+    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
+    Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
+    Q_PROPERTY(int depth READ depth WRITE setDepth NOTIFY depthChanged)
     Q_PROPERTY(QString source READ source WRITE setSource)
-    Q_PROPERTY(QVector3D spacing READ spacing WRITE setSpacing)
+    Q_PROPERTY(QVector3D spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
+    Q_PROPERTY(QVector3D size READ size NOTIFY sizeChanged)
 
 public:
     Texture3D(QObject* parent=0);
@@ -33,17 +34,28 @@ public:
 
     GlTexture3D* gl();
 
+    QVector3D size() const;
     QVector3D spacing() const;
 
 public slots:
-    void setHeight(int height);
-    void setWidth(int width);
-    void setDepth(int depth);
     void setChannels(int channels) override;
     void setType(const Type& type) override;
-    void setSpacing(const QVector3D& spacing);
 
     void setSource(const QString& source);
+
+    void setWidth(int width);
+    void setHeight(int height);
+    void setDepth(int depth);
+
+    void setSpacing(QVector3D spacing);
+
+signals:
+    void widthChanged(int width);
+    void heightChanged(int height);
+    void depthChanged(int depth);
+
+    void sizeChanged(QVector3D size);
+    void spacingChanged(QVector3D spacing);
 
 protected:
     void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;

@@ -118,6 +118,11 @@ GlTexture3D* Texture3D::gl()
     return _tex;
 }
 
+QVector3D Texture3D::size() const
+{
+    return QVector3D(_width, _height, _depth);
+}
+
 void Texture3D::attachTo(Framebuffer& /*fbo*/, Framebuffer::Attachment /*pos*/)
 {
     assert(false);
@@ -149,34 +154,14 @@ int Texture3D::width() const
     return _width;
 }
 
-void Texture3D::setWidth(int width)
-{
-    if(width < 0)
-        width = 0;
-    _width = width;
-}
-
 int Texture3D::height() const
 {
     return _height;
 }
 
-void Texture3D::setHeight(int height)
-{
-    if(height < 0)
-        height = 0;
-    _height = height;
-}
-
 int Texture3D::depth() const
 {
     return _depth;
-}
-void Texture3D::setDepth(int depth)
-{
-    if(depth < 0)
-        depth = 0;
-    _depth = depth;
 }
 
 int Texture3D::channels() const
@@ -211,6 +196,45 @@ void Texture3D::setSource(const QString& source)
         loadMHD(source);
         _source = source;
     }
+}
+
+void Texture3D::setWidth(int width)
+{
+    if (_width == width)
+        return;
+
+    _width = width;
+    emit widthChanged(width);
+    emit sizeChanged(size());
+}
+
+void Texture3D::setHeight(int height)
+{
+    if (_height == height)
+        return;
+
+    _height = height;
+    emit heightChanged(height);
+    emit sizeChanged(size());
+}
+
+void Texture3D::setDepth(int depth)
+{
+    if (_depth == depth)
+        return;
+
+    _depth = depth;
+    emit depthChanged(depth);
+    emit sizeChanged(size());
+}
+
+void Texture3D::setSpacing(QVector3D spacing)
+{
+    if (_spacing == spacing)
+        return;
+
+    _spacing = spacing;
+    emit spacingChanged(spacing);
 }
 
 bool Texture3D::loadMHD(const QString& header)
@@ -253,6 +277,10 @@ bool Texture3D::loadMHD(const QString& header)
     while(!stream.atEnd())
     {
         auto line = stream.readLine().trimmed();
+        // ignore comments
+        if(line.startsWith('#'))
+            continue;
+
         auto split = line.split('=');
         if(split.length() != 2)
         {
@@ -343,12 +371,12 @@ bool Texture3D::loadMHD(const QString& header)
         return false;
     }
 
-    _type = type;
-    _width = width;
-    _height = height;
-    _depth = depth;
-    _channels = channels;
-    _spacing = spacing;
+    setType(type);
+    setWidth(width);
+    setHeight(height);
+    setDepth(depth);
+    setChannels(channels);
+    setSpacing(spacing);
     _data = data;
     return true;
 }
@@ -356,10 +384,5 @@ bool Texture3D::loadMHD(const QString& header)
 QVector3D Texture3D::spacing() const
 {
     return _spacing;
-}
-
-void Texture3D::setSpacing(const QVector3D& spacing)
-{
-    _spacing = spacing;
 }
 

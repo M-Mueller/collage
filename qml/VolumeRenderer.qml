@@ -12,6 +12,7 @@ import RenderBuffer 1.0
 import TurnTableCamera 1.0
 import Rectangle 1.0
 import Cube 1.0
+import BoundingBox 1.0
 import ClearFramebuffer 1.0
 import Uniforms 1.0
 import UniformStruct 1.0
@@ -225,6 +226,23 @@ VisualizationFramebuffer {
             size: Qt.vector3d(volume.width*volume.spacing.x,
                               volume.height*volume.spacing.y,
                               volume.depth*volume.spacing.z)
+        }
+    }
+
+    RenderPass {
+        vertexShaderPath: "/home/markus/Projects/vis/glsl/Default.vs"
+        fragmentShaderPath: "/home/markus/Projects/vis/glsl/Default.fs"
+
+        Uniforms {
+            property matrix4x4 viewMatrix: camera.viewMatrix
+            property matrix4x4 projectionMatrix: camera.projectionMatrix
+
+            property color color: "red"
+        }
+
+        BoundingBox {
+            renderMode: BoundingBox.Wireframe
+            size: volume.size.times(volume.spacing)
         }
     }
 }

@@ -16,7 +16,9 @@ RenderPass::RenderPass(QObject* parent):
     _forceShaderReload(false),
     _program(nullptr),
     _renderToTexture(nullptr),
-    _viewport(QRect())
+    _enabled(true),
+    _viewport(QRect()),
+    _depthTest(true)
 {
 
 }
@@ -104,6 +106,7 @@ void RenderPass::synchronize()
         }
     }
 
+    _enabled.synchronize();
     _viewport.synchronize();
     _depthTest.synchronize();
 
@@ -112,7 +115,7 @@ void RenderPass::synchronize()
 
 void RenderPass::render()
 {
-    if(!_program)
+    if(!_program || !_enabled.gl())
         return;
 
     GLint prevFBO = 0;
@@ -204,6 +207,11 @@ bool RenderPass::depthTest() const
     return _depthTest;
 }
 
+bool RenderPass::enabled() const
+{
+    return _enabled;
+}
+
 void RenderPass::setDepthTest(bool depthTest)
 {
     _depthTest = depthTest;
@@ -226,6 +234,15 @@ void RenderPass::setViewport(const QRect& viewport)
 void RenderPass::reloadShaders()
 {
     _forceShaderReload = true;
+}
+
+void RenderPass::setEnabled(bool enabled)
+{
+    if (_enabled == enabled)
+        return;
+
+    _enabled = enabled;
+    emit enabledChanged(enabled);
 }
 
 Framebuffer* RenderPass::renderToTexture() const

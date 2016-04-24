@@ -18,6 +18,7 @@ class GlProgram;
 class RenderPass: public QObject, public RendererElement
 {
     Q_OBJECT
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString vertexShaderPath READ vertexShaderPath WRITE setVertexShaderPath)
     Q_PROPERTY(QString geometryShaderPath READ geometryShaderPath WRITE setGeometryShaderPath)
     Q_PROPERTY(QString fragmentShaderPath READ fragmentShaderPath WRITE setFragmentShaderPath)
@@ -43,6 +44,8 @@ public:
 
     bool depthTest() const;
 
+    bool enabled() const;
+
 public slots:
     void setVertexShaderPath(const QString& vertexShaderPath);
     void setGeometryShaderPath(const QString& geometryShaderPath);
@@ -55,8 +58,11 @@ public slots:
 
     Q_INVOKABLE void reloadShaders();
 
+    void setEnabled(bool enabled);
+
 signals:
-    void viewportChanged(QRect viewport);
+    void viewportChanged(QRect viewport);    
+    void enabledChanged(bool enabled);
 
 private:
     static void appendEntity(QQmlListProperty<Entity>* list, Entity* value);
@@ -75,6 +81,7 @@ private:
 
     Framebuffer* _renderToTexture;
 
+    RendererProperty<bool> _enabled;
     RendererProperty<QRect> _viewport;
     RendererProperty<bool> _depthTest;
 };
