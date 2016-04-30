@@ -37,14 +37,14 @@ void Cube::synchronize()
         //   |.'    | .'
         // 4 +------+'5
         std::vector<QVector3D> vertices = {
-           _size*QVector3D(-1.0f, -1.0f, -1.0f),
-           _size*QVector3D(1.0f, -1.0f, -1.0f),
-           _size*QVector3D(1.0f, 1.0f, -1.0f),
-           _size*QVector3D(-1.0f, 1.0f, -1.0f),
-           _size*QVector3D(-1.0f, -1.0f, 1.0f),
-           _size*QVector3D(1.0f, -1.0f, 1.0f),
-           _size*QVector3D(1.0f, 1.0f, 1.0f),
-           _size*QVector3D(-1.0f, 1.0f, 1.0f)
+           0.5*_size*QVector3D(-1.0f, -1.0f, -1.0f),
+           0.5*_size*QVector3D(1.0f, -1.0f, -1.0f),
+           0.5*_size*QVector3D(1.0f, 1.0f, -1.0f),
+           0.5*_size*QVector3D(-1.0f, 1.0f, -1.0f),
+           0.5*_size*QVector3D(-1.0f, -1.0f, 1.0f),
+           0.5*_size*QVector3D(1.0f, -1.0f, 1.0f),
+           0.5*_size*QVector3D(1.0f, 1.0f, 1.0f),
+           0.5*_size*QVector3D(-1.0f, 1.0f, 1.0f)
         };
 
         std::vector<QVector3D> colors = {

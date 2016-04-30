@@ -1,5 +1,6 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
 
 #include "easylogging++.h"
 
@@ -21,6 +22,7 @@
 #include "BindTexture.h"
 #include "PopOver.h"
 #include "BoundingBox.h"
+#include "Volume.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<Texture1D>("Texture1D", 1, 0, "Texture1D");
     qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
     qmlRegisterType<Texture3D>("Texture3D", 1, 0, "Texture3D");
+
+    qmlRegisterUncreatableType<Volume>("Volume", 1, 0, "Volume", "Use VolumeLoader");
 
     qmlRegisterType<Framebuffer>("Framebuffer", 1, 0, "Framebuffer");
     qmlRegisterType<RenderBuffer>("RenderBuffer", 1, 0, "RenderBuffer");
@@ -53,7 +57,9 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<PopOver>("PopOver", 1, 0, "PopOver");
 
+    VolumeLoader loader;
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("VolumeLoader", &loader);
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     return app.exec();

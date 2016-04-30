@@ -40,14 +40,14 @@ void BoundingBox::synchronize()
         //   |.'    | .'
         // 4 +------+'5
         std::vector<QVector3D> vertices = {
-           _size*QVector3D(-1.0f, -1.0f, -1.0f),
-           _size*QVector3D(1.0f, -1.0f, -1.0f),
-           _size*QVector3D(1.0f, 1.0f, -1.0f),
-           _size*QVector3D(-1.0f, 1.0f, -1.0f),
-           _size*QVector3D(-1.0f, -1.0f, 1.0f),
-           _size*QVector3D(1.0f, -1.0f, 1.0f),
-           _size*QVector3D(1.0f, 1.0f, 1.0f),
-           _size*QVector3D(-1.0f, 1.0f, 1.0f)
+           _center + 0.5*_size*QVector3D(-1.0f, -1.0f, -1.0f),
+           _center + 0.5*_size*QVector3D(1.0f, -1.0f, -1.0f),
+           _center + 0.5*_size*QVector3D(1.0f, 1.0f, -1.0f),
+           _center + 0.5*_size*QVector3D(-1.0f, 1.0f, -1.0f),
+           _center + 0.5*_size*QVector3D(-1.0f, -1.0f, 1.0f),
+           _center + 0.5*_size*QVector3D(1.0f, -1.0f, 1.0f),
+           _center + 0.5*_size*QVector3D(1.0f, 1.0f, 1.0f),
+           _center + 0.5*_size*QVector3D(-1.0f, 1.0f, 1.0f)
         };
 
         std::vector<unsigned short> indices;
@@ -118,6 +118,8 @@ void BoundingBox::synchronize()
     }
 
     _renderMode.synchronize();
+
+    _update = false;
 }
 
 void BoundingBox::render(GlProgram&)

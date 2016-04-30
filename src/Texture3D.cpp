@@ -1,4 +1,5 @@
 #include "Texture3D.h"
+#include "Volume.h"
 #include "easylogging++.h"
 
 #include <QtCore/QFileInfo>
@@ -15,8 +16,9 @@ Texture3D::Texture3D(QObject* parent):
     _width(0),
     _height(0),
     _depth(0),
-    _spacing(1.0, 1.0, 1.0),
-    _tex(nullptr)
+    _volume(nullptr),
+    _tex(nullptr),
+    _update(false)
 {
 
 }
@@ -86,28 +88,34 @@ void Texture3D::synchronize()
     }
     assert(_tex);
 
-    if(_data.isNull())
+    if(_update)
     {
-        if(_tex->width() != _width || _tex->height() != _height || _tex->format() != format)
+        _update = false;
+        if(_volume)
         {
-            LOG(INFO) << "Resizing Texture3D";
-            // resize the texture if the dimensions changed
+            LOG(INFO) << "Uploading Texture3D";
+            assert(width() == _volume->width());
+            assert(height() == _volume->height());
+            assert(depth() == _volume->depth());
+            assert(channels() == _volume->channels());
+            assert(mapToPixelType.count(type()));
+            assert(mapToPixelFormat.count(channels()));
+
             _tex->bind();
-            _tex->resize(format, _width, _height, _depth);
+            _tex->setImageData(format, width(), height(), depth(), mapToPixelFormat[channels()], mapToPixelType[type()], _volume->constPointer());
             _tex->release();
         }
-    }
-    else
-    {
-        LOG(INFO) << "Uploading Texture3D (source: " << _source << ")";
-        assert(_data.size() == _width*_height*_depth*_channels*typeSize(_type));
-        assert(mapToPixelType.count(_type));
-        assert(mapToPixelFormat.count(_channels));
-
-        _tex->bind();
-        _tex->setImageData(format, _width, _height, _depth, mapToPixelFormat[_channels], mapToPixelType[_type], _data.constData());
-        _tex->release();
-        _data.clear();
+        else
+        {
+            if(_tex->width() != _width || _tex->height() != _height || _tex->format() != format)
+            {
+                LOG(INFO) << "Resizing Texture3D";
+                // resize the texture if the dimensions changed
+                _tex->bind();
+                _tex->resize(format, _width, _height, _depth);
+                _tex->release();
+            }
+        }
     }
 
     RendererElement::synchronize();
@@ -151,51 +159,74 @@ void Texture3D::unbind(int unit)
 
 int Texture3D::width() const
 {
-    return _width;
+    if(_volume)
+        return _volume->width();
+    else
+        return _width;
 }
 
 int Texture3D::height() const
 {
-    return _height;
+    if(_volume)
+        return _volume->height();
+    else
+        return _height;
 }
 
 int Texture3D::depth() const
 {
-    return _depth;
+    if(_volume)
+        return _volume->depth();
+    else
+        return _depth;
 }
 
 int Texture3D::channels() const
 {
-    return Texture::channels();
+    if(_volume)
+        return _volume->channels();
+    else
+        return Texture::channels();
 }
 
 void Texture3D::setChannels(int channels)
 {
     Texture::setChannels(channels);
+    setVolume(nullptr);
 }
 
 Texture::Type Texture3D::type() const
 {
-    return Texture::type();
+    if(_volume)
+    {
+        switch (_volume->type())
+        {
+        case Volume::Char:
+            return Char;
+        case Volume::UnsignedChar:
+            return UnsignedChar;
+        case Volume::Short:
+            return Short;
+        case Volume::UnsignedShort:
+            return UnsignedShort;
+        case Volume::Float:
+            return Float;
+        default:
+            assert(false);
+            return Char;
+        }
+    }
+    else
+    {
+        return Texture::type();
+    }
 }
 
 void Texture3D::setType(const Texture::Type& type)
 {
     Texture::setType(type);
-}
-
-QString Texture3D::source() const
-{
-    return _source;
-}
-
-void Texture3D::setSource(const QString& source)
-{
-    if(source.endsWith(".mhd"))
-    {
-        loadMHD(source);
-        _source = source;
-    }
+    setVolume(nullptr);
+    _update = true;
 }
 
 void Texture3D::setWidth(int width)
@@ -204,6 +235,8 @@ void Texture3D::setWidth(int width)
         return;
 
     _width = width;
+    setVolume(nullptr);
+    _update = true;
     emit widthChanged(width);
     emit sizeChanged(size());
 }
@@ -214,6 +247,8 @@ void Texture3D::setHeight(int height)
         return;
 
     _height = height;
+    setVolume(nullptr);
+    _update = true;
     emit heightChanged(height);
     emit sizeChanged(size());
 }
@@ -224,165 +259,25 @@ void Texture3D::setDepth(int depth)
         return;
 
     _depth = depth;
+    setVolume(nullptr);
+    _update = true;
     emit depthChanged(depth);
     emit sizeChanged(size());
 }
 
-void Texture3D::setSpacing(QVector3D spacing)
+void Texture3D::setVolume(Volume* volume)
 {
-    if (_spacing == spacing)
+    if (_volume == volume)
         return;
 
-    _spacing = spacing;
-    emit spacingChanged(spacing);
+    _volume = volume;
+    _update = true;
+    emit volumeChanged(volume);
 }
 
-bool Texture3D::loadMHD(const QString& header)
+
+Volume* Texture3D::volume() const
 {
-    QFile file(header);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        LOG(ERROR) << "Could not open file: " << header;
-        return false;
-    }
-
-    int dim = -1;
-    int width = -1;
-    int height = -1;
-    int depth = 1;
-    int channels = 1;
-    Type type = (Type)-1;
-    QVector3D spacing(1, 1, 1);
-    QString rawPath;
-
-    auto readInt = [](const QString& str, int& out)
-    {
-        bool ok;
-        out = str.toInt(&ok);
-        if(!ok)
-            LOG(ERROR) << "Invalid MHD tag (not a integer): " << str;
-        return ok;
-    };
-
-    auto readFloat = [](const QString& str, float& out)
-    {
-        bool ok;
-        out = str.toFloat(&ok);
-        if(!ok)
-            LOG(ERROR) << "Invalid MHD tag (not a double): " << str;
-        return ok;
-    };
-
-    QTextStream stream(&file);
-    while(!stream.atEnd())
-    {
-        auto line = stream.readLine().trimmed();
-        // ignore comments
-        if(line.startsWith('#'))
-            continue;
-
-        auto split = line.split('=');
-        if(split.length() != 2)
-        {
-            LOG(ERROR) << "Skipping invalid MHD tag (too many elements): " << line;
-            continue;
-        }
-        auto token = split[0].trimmed();
-        auto value = split[1].trimmed();
-
-        if(token.startsWith("NDims"))
-        {
-            if(!readInt(value, dim))
-                return false;
-        }
-        else if(token.startsWith("DimSize"))
-        {
-            auto dims = value.split(' ');
-            if(!readInt(dims.value(0, "1"), width)
-               || !readInt(dims.value(1, "1"), height)
-               || !readInt(dims.value(2, "1"), depth))
-                return false;
-        }
-        else if(token.startsWith("ElementType"))
-        {
-            if(value == "MET_CHAR")
-                type = Char;
-            else if(value == "MET_UCHAR")
-                type = UnsignedChar;
-            else if(value == "MET_SHORT")
-                type = Short;
-            else if(value == "MET_USHORT")
-                type = UnsignedShort;
-            else if(value == "MET_FLOAT")
-                type = Float;
-            else
-            {
-                LOG(ERROR) << "Unsupported type: " << value;
-                return false;
-            }
-        }
-        else if(token.startsWith("ElementDataFile"))
-        {
-            rawPath = value;
-        }
-        else if(token.startsWith("ElementSpacing"))
-        {
-            auto dims = value.split(' ');
-            if(!readFloat(dims.value(0, "1"), spacing[0])
-               || !readFloat(dims.value(1, "1"), spacing[1])
-               || !readFloat(dims.value(2, "1"), spacing[2]))
-                return false;
-        }
-    }
-
-    if(width <= 0)
-    {
-        LOG(ERROR) << "Invalid or missing width: " << width;
-        return false;
-    }
-    if(height <= 0)
-    {
-        LOG(ERROR) << "Invalid or missing height: " << height;
-        return false;
-    }
-    if(depth <= 0)
-    {
-        LOG(ERROR) << "Invalid or missing depth: " << depth;
-        return false;
-    }
-    if(type == -1)
-    {
-        LOG(ERROR) << "Missing type";
-        return false;
-    }
-
-    rawPath = QFileInfo(header).absolutePath() + "/" + rawPath;
-    QFile rawFile(rawPath);
-    if(!rawFile.open(QIODevice::ReadOnly))
-    {
-        LOG(ERROR) << "Could not open raw file: " << rawPath;
-        return false;
-    }
-
-    QByteArray data = rawFile.readAll();
-    if(data.size() != width*height*depth*channels*typeSize(type))
-    {
-        LOG(ERROR) << "Raw file has invalid size: " << data.size() << " (expected: " << width*height*depth*channels*typeSize(type) << ")";
-        return false;
-    }
-
-    setType(type);
-    setWidth(width);
-    setHeight(height);
-    setDepth(depth);
-    setChannels(channels);
-    setSpacing(spacing);
-    _data = data;
-    return true;
-}
-
-QVector3D Texture3D::spacing() const
-{
-    return _spacing;
+    return _volume;
 }
 

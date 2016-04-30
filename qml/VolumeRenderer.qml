@@ -19,7 +19,7 @@ import UniformStruct 1.0
 import BindTexture 1.0
 
 VisualizationFramebuffer {
-    id: volumeRenderer
+    id: root
 
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1} // flip the whole image
 
@@ -31,6 +31,7 @@ VisualizationFramebuffer {
     property int mode: 2
     property double windowWidth: 1.0
     property double windowCenter: 0.5
+    property var volume: VolumeLoader.fromMHD("/home/markus/Data/walnut.mhd")
 
     property alias transferFunction: transferFunction
 
@@ -53,19 +54,19 @@ VisualizationFramebuffer {
             camera.theta -= (originY - mouse.y)*0.01
             originX = mouse.x
             originY = mouse.y
-            volumeRenderer.update()
+            root.update()
         }
 
         onWheel: {
             camera.radius -= wheel.angleDelta.y/10
             wheel.accepted = true;
-            volumeRenderer.update()
+            root.update()
         }
     }
 
     TurnTableCamera {
         id: camera
-        aspectRatio: volumeRenderer.width/volumeRenderer.height
+        aspectRatio: root.width/root.height
         radius: 100
 
         property matrix4x4 invViewProjMatrix: viewMatrix.inverted().times(projectionMatrix.inverted())
@@ -83,9 +84,8 @@ VisualizationFramebuffer {
     }
 
     Texture3D {
-        id: volume
-        //source: "/home/markus/Data/Bucky.mhd"
-        source: "/home/markus/Data/walnut.mhd"
+        id: volumeTex
+        volume: root.volume
     }
 
     Texture1D {
@@ -109,7 +109,7 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.fs"
 
-        viewport: Qt.rect(0, 0, volumeRenderer.width, volumeRenderer.height)
+        viewport: Qt.rect(0, 0, root.width, root.height)
 
         depthTest: false
 
@@ -117,14 +117,14 @@ VisualizationFramebuffer {
             colorAttachment0: Texture2D {
                 id: rayEntryTex
                 type: Texture2D.Float
-                width: volumeRenderer.width
-                height: volumeRenderer.height
+                width: root.width
+                height: root.height
                 channels: 4
             }
             depthAttachment: RenderBuffer {
                 type: Texture.Depth24
-                width: volumeRenderer.width
-                height: volumeRenderer.height
+                width: root.width
+                height: root.height
             }
         }
 
@@ -169,7 +169,7 @@ VisualizationFramebuffer {
         vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
         fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
 
-        viewport: Qt.rect(0, 0, volumeRenderer.width, volumeRenderer.height)
+        viewport: Qt.rect(0, 0, root.width, root.height)
 
         depthTest: true
 
@@ -179,7 +179,7 @@ VisualizationFramebuffer {
         }
 
         BindTexture {
-            texture: volume
+            texture: volumeTex
             unit: 2
         }
 
@@ -196,15 +196,15 @@ VisualizationFramebuffer {
             property int rayEntryTex: 1
 
             property int volume: 2
-            property vector3d volumeSize: Qt.vector3d(volume.width, volume.height, volume.depth)
-            property vector3d volumeSpacing: volume.spacing
+            property vector3d volumeSize: Qt.vector3d(root.volume.width, root.volume.height, root.volume.depth)
+            property vector3d volumeSpacing: root.volume.spacing
 
-            property double step: Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z))
+            property double step: Math.max(root.volume.spacing.x, Math.max(root.volume.spacing.y, root.volume.spacing.z))
 
-            property double windowWidth: volumeRenderer.windowWidth
-            property double windowCenter: volumeRenderer.windowCenter
+            property double windowWidth: root.windowWidth
+            property double windowCenter: root.windowCenter
 
-            property int mode: volumeRenderer.mode
+            property int mode: root.mode
             property double iso: 0.5
             property int transferFunction: 3
 

@@ -49,6 +49,7 @@ set(SOURCES
     src/BindTexture.cpp
     src/PopOver.cpp
     src/BoundingBox.cpp
+    src/Volume.cpp
 )
 
 set(HEADERS
@@ -73,6 +74,7 @@ set(HEADERS
     include/BindTexture.h
     include/PopOver.h
     include/BoundingBox.h
+    include/Volume.h
 )
 
 set(QML

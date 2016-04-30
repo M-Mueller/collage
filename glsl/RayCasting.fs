@@ -41,7 +41,7 @@ struct Ray
 
 vec3 worldToVoxel(vec3 world)
 {
-    return (world/(volumeSize*volumeSpacing) + vec3(1.0))/2.0;
+    return (world/(0.5*volumeSize*volumeSpacing) + vec3(1.0))/2.0;
 }
 
 float getValue(vec3 position)
