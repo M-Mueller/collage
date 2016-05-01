@@ -17,6 +17,7 @@ import ClearFramebuffer 1.0
 import Uniforms 1.0
 import UniformStruct 1.0
 import BindTexture 1.0
+import Image 1.0
 
 VisualizationFramebuffer {
     id: root
@@ -31,7 +32,6 @@ VisualizationFramebuffer {
     property int mode: 2
     property double windowWidth: 1.0
     property double windowCenter: 0.5
-    property var volume: VolumeLoader.fromMHD("/home/markus/Data/walnut.mhd")
 
     property alias transferFunction: transferFunction
 
@@ -85,7 +85,10 @@ VisualizationFramebuffer {
 
     Texture3D {
         id: volumeTex
-        volume: root.volume
+        volume: Image {
+            id: volume
+            source: "/home/markus/Data/walnut.mhd"
+        }
     }
 
     Texture1D {
@@ -196,10 +199,10 @@ VisualizationFramebuffer {
             property int rayEntryTex: 1
 
             property int volume: 2
-            property vector3d volumeSize: Qt.vector3d(root.volume.width, root.volume.height, root.volume.depth)
-            property vector3d volumeSpacing: root.volume.spacing
+            property vector3d volumeSize: Qt.vector3d(volume.width, volume.height, volume.depth)
+            property vector3d volumeSpacing: volume.spacing
 
-            property double step: Math.max(root.volume.spacing.x, Math.max(root.volume.spacing.y, root.volume.spacing.z))
+            property double step: Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z))
 
             property double windowWidth: root.windowWidth
             property double windowCenter: root.windowCenter

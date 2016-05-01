@@ -1,5 +1,5 @@
 #include "Texture3D.h"
-#include "Volume.h"
+#include "Image.h"
 #include "easylogging++.h"
 
 #include <QtCore/QFileInfo>
@@ -102,7 +102,7 @@ void Texture3D::synchronize()
             assert(mapToPixelFormat.count(channels()));
 
             _tex->bind();
-            _tex->setImageData(format, width(), height(), depth(), mapToPixelFormat[channels()], mapToPixelType[type()], _volume->constPointer());
+            _tex->setImageData(format, width(), height(), depth(), mapToPixelFormat[channels()], mapToPixelType[type()], _volume->data());
             _tex->release();
         }
         else
@@ -201,15 +201,15 @@ Texture::Type Texture3D::type() const
     {
         switch (_volume->type())
         {
-        case Volume::Char:
+        case ImageData::Char:
             return Char;
-        case Volume::UnsignedChar:
+        case ImageData::UnsignedChar:
             return UnsignedChar;
-        case Volume::Short:
+        case ImageData::Short:
             return Short;
-        case Volume::UnsignedShort:
+        case ImageData::UnsignedShort:
             return UnsignedShort;
-        case Volume::Float:
+        case ImageData::Float:
             return Float;
         default:
             assert(false);
@@ -265,7 +265,7 @@ void Texture3D::setDepth(int depth)
     emit sizeChanged(size());
 }
 
-void Texture3D::setVolume(Volume* volume)
+void Texture3D::setVolume(Image* volume)
 {
     if (_volume == volume)
         return;
@@ -276,7 +276,7 @@ void Texture3D::setVolume(Volume* volume)
 }
 
 
-Volume* Texture3D::volume() const
+Image* Texture3D::volume() const
 {
     return _volume;
 }

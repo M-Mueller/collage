@@ -6,7 +6,7 @@
 #include <QtGui/QImage>
 #include <QtCore/QObject>
 
-class Volume;
+class Image;
 class GlTexture3D;
 class Texture3D: public Texture
 {
@@ -15,7 +15,7 @@ class Texture3D: public Texture
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
     Q_PROPERTY(int depth READ depth WRITE setDepth NOTIFY depthChanged)
     Q_PROPERTY(QVector3D size READ size NOTIFY sizeChanged)
-    Q_PROPERTY(Volume* volume READ volume WRITE setVolume NOTIFY volumeChanged)
+    Q_PROPERTY(Image* volume READ volume WRITE setVolume NOTIFY volumeChanged)
 
 public:
     Texture3D(QObject* parent=0);
@@ -28,12 +28,11 @@ public:
     Type type() const override;
     QVector3D size() const;
 
-    Volume* volume() const;
+    Image* volume() const;
 
     virtual void synchronize() override;
 
     GlTexture3D* gl();
-
 
 public slots:
     void setChannels(int channels) override;
@@ -43,7 +42,7 @@ public slots:
     void setHeight(int height);
     void setDepth(int depth);
 
-    void setVolume(Volume* volume);
+    void setVolume(Image* volume);
 
 signals:
     void widthChanged(int width);
@@ -53,7 +52,7 @@ signals:
     void sizeChanged(QVector3D size);
     void spacingChanged(QVector3D spacing);
 
-    void volumeChanged(Volume* volume);
+    void volumeChanged(Image* volume);
 
 protected:
     void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
@@ -65,7 +64,7 @@ private:
     int _height;
     int _depth;
 
-    Volume* _volume;
+    Image* _volume;
     GlTexture3D* _tex;
 
     bool _update;
