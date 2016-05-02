@@ -92,6 +92,13 @@ float ImageDataTyped<T>::normalizedValue(int x, int y, int z, int c) const
     return (floatValue(x, y, z, c) + shift)*scale;
 }
 
+template<>
+float ImageDataTyped<float>::normalizedValue(int x, int y, int z, int c) const
+{
+    assert(hasIndex(x, y, z, c));
+    return _data[index(x, y, z, c)];
+}
+
 ImageData::ImageData(ImageData::Type t, int w, int h, int d, int c):
     type(t),
     width(w),

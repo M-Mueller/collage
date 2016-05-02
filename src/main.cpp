@@ -22,6 +22,7 @@
 #include "BindTexture.h"
 #include "PopOver.h"
 #include "BoundingBox.h"
+#include "Octree.h"
 #include "Image.h"
 
 INITIALIZE_EASYLOGGINGPP
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
     qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
     qmlRegisterType<BoundingBox>("BoundingBox", 1, 0, "BoundingBox");
+    qmlRegisterType<Octree>("Octree", 1, 0, "Octree");
     qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
     qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
     qmlRegisterType<UniformStruct>("UniformStruct", 1, 0, "UniformStruct");

@@ -48,6 +48,7 @@ set(SOURCES
     src/Uniforms.cpp
     src/BindTexture.cpp
     src/PopOver.cpp
+    src/Octree.cpp
     src/BoundingBox.cpp
     src/Image.cpp
     src/ImageData.cpp
@@ -74,6 +75,7 @@ set(HEADERS
     include/Uniforms.h
     include/BindTexture.h
     include/PopOver.h
+    include/Octree.h
     include/BoundingBox.h
     include/Image.h
     include/ImageData.h
