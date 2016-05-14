@@ -1,8 +1,7 @@
 #version 330
 
-uniform mat4 modelMatrix = mat4(1.0);
-
 uniform sampler2D rayEntryTex;
+uniform sampler2D rayExitTex;
 uniform sampler3D volume;
 uniform vec3 volumeSize;
 uniform vec3 volumeSpacing;
@@ -46,7 +45,10 @@ vec3 worldToVoxel(vec3 world)
 
 float getValue(vec3 position)
 {
-    float value = texture(volume, worldToVoxel(position)).r;
+    vec3 texCoord = worldToVoxel(position);
+    if(any(lessThan(texCoord, vec3(0.0))) || any(greaterThan(texCoord, vec3(1.0))))
+        return 0.0;
+    float value = texture(volume, texCoord).r;
     float left = (windowCenter - 0.5*windowWidth);
     float right = (windowCenter + 0.5*windowWidth);
     value = (value - left)/(right - left);
@@ -170,12 +172,31 @@ Ray directVolumeRenderingStep(float value, Ray ray)
 
 void main()
 {
-    vec3 rayEnter = texture(rayEntryTex, gl_FragCoord.xy/textureSize(rayEntryTex, 0)).rgb;
-    vec3 rayExit = fs_rayExit;
+    vec2 texCoord = gl_FragCoord.xy/textureSize(rayEntryTex, 0);
+    vec4 rayEnter = texture(rayEntryTex, texCoord);
+    vec4 rayExit = texture(rayExitTex, texCoord);
+
+    if(rayExit.a == 0.0 || rayEnter.a == 0.0)
+    {
+        // ignore pixel outside the proxy geometry
+        out_color = vec4(0.0);
+        return;
+    }
+
+    if(mode == 4)
+    {
+        out_color = vec4(worldToVoxel(rayEnter.xyz), 1.0);
+        return;
+    }
+    if(mode == 5)
+    {
+        out_color = vec4(worldToVoxel(rayExit.xyz), 1.0);
+        return;
+    }
 
     Ray ray;
-    ray.position = rayEnter;
-    ray.direction = normalize(rayExit - rayEnter);
+    ray.position = rayEnter.xyz;
+    ray.direction = normalize(rayExit.xyz - rayEnter.xyz);
     ray.color = vec4(0.0);
     ray.terminate = false;
     ray.maximum = 0.0;
@@ -188,7 +209,7 @@ void main()
             ray = isoSurfaceStep(value, ray);
         else if(mode == 1)
             ray = maximumIntensityStep(value, ray);
-        else if(mode >= 2)
+        else if(mode == 2 || mode == 3)
             ray = directVolumeRenderingStep(value, ray);
 
         if(ray.terminate)

@@ -59,12 +59,17 @@ void Octree::render(GlProgram& program)
     {
         std::function<void(NodePtr&)> render = [&](NodePtr& node)
         {
-            //if(node->max > 0)
+            if(node->min <= 0.5 && node->max >= 0.5)
             {
-                for(auto& c: node->children)
-                    render(c);
-                program.setUniform("color", colors[node->level]);
-                node->bb.render(program);
+                if(node->children.empty())
+                {
+                    node->bb.render(program);
+                }
+                else
+                {
+                    for(auto& c: node->children)
+                        render(c);
+                }
             }
         };
 
@@ -94,6 +99,7 @@ void Octree::compute()
         return;
 
     auto root = std::make_unique<Node>();
+    root->bb.setRenderMode(BoundingBox::Solid);
     root->level = 0;
     root->bb.setCenter(QVector3D(0, 0, 0));
     root->bb.setSize(_volume->size());
@@ -113,34 +119,19 @@ void Octree::compute()
 
         std::vector<int> sx, sy, sz;
         if(childSize.x() < minBBSize.x())
-        {
             sx = {0};
-            childSize.setX(childSize.x()*2);
-        }
         else
-        {
             sx = {-1, 1};
-        }
 
         if(childSize.y() < minBBSize.y())
-        {
             sy = {0};
-            childSize.setY(childSize.y()*2);
-        }
         else
-        {
             sy = {-1, 1};
-        }
 
         if(childSize.z() < minBBSize.z())
-        {
             sz = {0};
-            childSize.setZ(childSize.z()*2);
-        }
         else
-        {
             sz = {-1, 1};
-        }
 
         for(int x: sx)
         {
@@ -148,13 +139,10 @@ void Octree::compute()
             {
                 for(int z: sz)
                 {
-                    QVector3D pixelShift(childSize.x() - std::floor(childSize.x()),
-                                         childSize.y() - std::floor(childSize.y()),
-                                         childSize.z() - std::floor(childSize.z()));
-
                     auto child = std::make_unique<Node>();
-                    child->bb.setSize(childSize + pixelShift*QVector3D(x, y, z));
-                    child->bb.setCenter(center + QVector3D(x, y, z)*0.5*childSize - 0.5*pixelShift);
+                    child->bb.setRenderMode(BoundingBox::Solid);
+                    child->bb.setSize(childSize);
+                    child->bb.setCenter(center + QVector3D(x, y, z)*0.5*childSize);
                     child->level = parent->level + 1;
                     parent->children.push_back(std::move(child));
                 }
@@ -185,12 +173,12 @@ void Octree::compute()
             QVector3D offset = node->bb.center() - 0.5*node->bb.size();
             QVector3D size = node->bb.size();
 
-            int zStart = offset.z() + centerOffset.z();
-            int zEnd = zStart + size.z();
-            int yStart = offset.y() + centerOffset.y();
-            int yEnd = yStart + size.y();
-            int xStart = offset.x() + centerOffset.x();
-            int xEnd = xStart + size.x();
+            int zStart = static_cast<int>(std::floor(offset.z() + centerOffset.z()));
+            int zEnd = static_cast<int>(std::ceil(zStart + size.z()));
+            int yStart = static_cast<int>(std::floor(offset.y() + centerOffset.y()));
+            int yEnd = static_cast<int>(std::ceil(yStart + size.y()));
+            int xStart = static_cast<int>(std::floor(offset.x() + centerOffset.x()));
+            int xEnd = static_cast<int>(std::ceil(xStart + size.x()));
 
             node->min = _volume->normalizedValue(xStart, yStart, zStart, 0);
             node->max = node->min;

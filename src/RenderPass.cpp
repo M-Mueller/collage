@@ -18,7 +18,9 @@ RenderPass::RenderPass(QObject* parent):
     _renderToTexture(nullptr),
     _enabled(true),
     _viewport(QRect()),
-    _depthTest(true)
+    _depthTest(false),
+    _depthFunc(DepthFunc::Less),
+    _cullMode(CullMode::None)
 {
 
 }
@@ -109,6 +111,8 @@ void RenderPass::synchronize()
     _enabled.synchronize();
     _viewport.synchronize();
     _depthTest.synchronize();
+    _depthFunc.synchronize();
+    _cullMode.synchronize();
 
     RendererElement::synchronize();
 }
@@ -135,6 +139,52 @@ void RenderPass::render()
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);
+    GLenum depthFunc = GL_LESS;
+    switch(_depthFunc)
+    {
+    case DepthFunc::Never:
+        depthFunc = GL_NEVER;
+        break;
+    case DepthFunc::Always:
+        depthFunc = GL_ALWAYS;
+        break;
+    case DepthFunc::Less:
+        depthFunc = GL_LESS;
+        break;
+    case DepthFunc::LessEqual:
+        depthFunc = GL_LEQUAL;
+        break;
+    case DepthFunc::Greater:
+        depthFunc = GL_GREATER;
+        break;
+    case DepthFunc::GreaterEqual:
+        depthFunc = GL_GEQUAL;
+        break;
+    case DepthFunc::Equal:
+        depthFunc = GL_EQUAL;
+        break;
+    case DepthFunc::NotEqual:
+        depthFunc = GL_NOTEQUAL;
+        break;
+    }
+    glDepthFunc(depthFunc);
+
+    if(_cullMode.gl() != CullMode::None)
+    {
+        glEnable(GL_CULL_FACE);
+        if(_cullMode.gl() == CullMode::Front)
+        {
+            glCullFace(GL_FRONT);
+        }
+        else
+        {
+           glCullFace(GL_BACK);
+        }
+    }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
 
     _program->activate();
 
@@ -212,9 +262,14 @@ bool RenderPass::enabled() const
     return _enabled;
 }
 
-void RenderPass::setDepthTest(bool depthTest)
+CullMode::Enum RenderPass::cullMode() const
 {
-    _depthTest = depthTest;
+    return _cullMode;
+}
+
+DepthFunc::Enum RenderPass::depthFunc() const
+{
+    return _depthFunc;
 }
 
 QRect RenderPass::viewport() const
@@ -236,6 +291,15 @@ void RenderPass::reloadShaders()
     _forceShaderReload = true;
 }
 
+void RenderPass::setCullMode(CullMode::Enum cullMode)
+{
+    if (_cullMode == cullMode)
+        return;
+
+    _cullMode = cullMode;
+    emit cullModeChanged(cullMode);
+}
+
 void RenderPass::setEnabled(bool enabled)
 {
     if (_enabled == enabled)
@@ -243,6 +307,24 @@ void RenderPass::setEnabled(bool enabled)
 
     _enabled = enabled;
     emit enabledChanged(enabled);
+}
+
+void RenderPass::setDepthTest(bool depthTest)
+{
+    if(_depthTest == depthTest)
+        return;
+
+    _depthTest = depthTest;
+    emit depthTestChanged(depthTest);
+}
+
+void RenderPass::setDepthFunc(DepthFunc::Enum depthFunc)
+{
+    if (_depthFunc == depthFunc)
+        return;
+
+    _depthFunc = depthFunc;
+    emit depthFuncChanged(depthFunc);
 }
 
 Framebuffer* RenderPass::renderToTexture() const

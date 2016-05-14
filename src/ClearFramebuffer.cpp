@@ -6,7 +6,7 @@ ClearFramebuffer::ClearFramebuffer(QObject* parent):
     _clearColorBuffer(false),
     _clearDepthBuffer(false),
     _clearStencilBuffer(false),
-    _clearColor(Qt::black),
+    _clearColor(QColor(0, 0, 0, 0)),
     _clearDepth(1.0)
 {
 

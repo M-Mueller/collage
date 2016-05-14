@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
     qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
+    qmlRegisterUncreatableType<DepthFunc>("DepthFunc", 1, 0, "DepthFunc", "DepthFunc is an enum");
+    qmlRegisterUncreatableType<CullMode>("CullMode", 1, 0, "CullMode", "CullMode is an enum");
 
     qmlRegisterUncreatableType<Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
     qmlRegisterType<Texture1D>("Texture1D", 1, 0, "Texture1D");

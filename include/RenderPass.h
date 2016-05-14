@@ -15,6 +15,38 @@ class Entity;
 class Camera;
 class Framebuffer;
 class GlProgram;
+
+class DepthFunc: public QObject // must be a QObject for the Q_ENUM macro
+{
+    Q_OBJECT
+public:
+    enum Enum
+    {
+        Never,
+        Always,
+        Less,
+        LessEqual,
+        Greater,
+        GreaterEqual,
+        Equal,
+        NotEqual
+    };
+    Q_ENUM(Enum)
+};
+
+class CullMode: public QObject
+{
+    Q_OBJECT
+public:
+    enum Enum
+    {
+        None,
+        Front,
+        Back
+    };
+    Q_ENUM(Enum)
+};
+
 class RenderPass: public QObject, public RendererElement
 {
     Q_OBJECT
@@ -24,9 +56,12 @@ class RenderPass: public QObject, public RendererElement
     Q_PROPERTY(QString fragmentShaderPath READ fragmentShaderPath WRITE setFragmentShaderPath)
     Q_PROPERTY(Framebuffer* renderToTexture READ renderToTexture WRITE setRenderToTexture)
     Q_PROPERTY(QRect viewport READ viewport WRITE setViewport NOTIFY viewportChanged)
-    Q_PROPERTY(bool depthTest READ depthTest WRITE setDepthTest)
+    Q_PROPERTY(bool depthTest READ depthTest WRITE setDepthTest NOTIFY depthTestChanged)
+    Q_PROPERTY(DepthFunc::Enum depthFunc READ depthFunc WRITE setDepthFunc NOTIFY depthFuncChanged)
+    Q_PROPERTY(CullMode::Enum cullMode READ cullMode WRITE setCullMode NOTIFY cullModeChanged)
     Q_PROPERTY(QQmlListProperty<Entity> entities READ entities)
     Q_CLASSINFO("DefaultProperty", "entities")
+
 public:
     RenderPass(QObject* parent=0);
     virtual ~RenderPass();
@@ -43,6 +78,9 @@ public:
     QRect viewport() const;
 
     bool depthTest() const;
+    DepthFunc::Enum depthFunc() const;
+
+    CullMode::Enum cullMode() const;
 
     bool enabled() const;
 
@@ -55,14 +93,20 @@ public slots:
     void setViewport(const QRect& viewport);
 
     void setDepthTest(bool depthTest);
+    void setDepthFunc(DepthFunc::Enum depthFunc);
 
-    Q_INVOKABLE void reloadShaders();
+    void setCullMode(CullMode::Enum cullMode);
 
     void setEnabled(bool enabled);
+
+    Q_INVOKABLE void reloadShaders();
 
 signals:
     void viewportChanged(QRect viewport);    
     void enabledChanged(bool enabled);
+    void depthTestChanged(bool depthTest);
+    void depthFuncChanged(DepthFunc::Enum depthFunc);
+    void cullModeChanged(CullMode::Enum cullMode);
 
 private:
     static void appendEntity(QQmlListProperty<Entity>* list, Entity* value);
@@ -84,6 +128,8 @@ private:
     RendererProperty<bool> _enabled;
     RendererProperty<QRect> _viewport;
     RendererProperty<bool> _depthTest;
+    RendererProperty<DepthFunc::Enum> _depthFunc;
+    RendererProperty<CullMode::Enum> _cullMode;
 };
 
 

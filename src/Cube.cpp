@@ -11,7 +11,6 @@
 
 Cube::Cube(QObject* parent):
     Entity(parent),
-    _cullMode(None),
     _size(1.0, 1.0, 1.0)
 {
 
@@ -100,41 +99,16 @@ void Cube::synchronize()
             _ibo = nullptr;
         }
     }
-    _cullMode.synchronize();
 }
 
 void Cube::render(GlProgram&)
 {
-    if(_cullMode.gl() != None)
-    {
-        glEnable(GL_CULL_FACE);
-        if(_cullMode.gl() == Front)
-            glCullFace(GL_FRONT);
-        else
-            glCullFace(GL_BACK);
-    }
-
     if(_vao)
     {
         _vao->bind();
         _vao->drawElements(GlVertexArray::Primitive::Triangles);
         _vao->release();
     }
-
-    if(_cullMode.gl() != None)
-    {
-        glDisable(GL_CULL_FACE);
-    }
-}
-
-Cube::CullMode Cube::cullMode() const
-{
-    return _cullMode;
-}
-
-void Cube::setCullMode(const CullMode& cullMode)
-{
-    _cullMode = cullMode;
 }
 
 QVector3D Cube::size() const

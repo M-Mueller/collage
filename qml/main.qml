@@ -88,7 +88,7 @@ ApplicationWindow {
 
         SpinBox {
             minimumValue: 0
-            maximumValue: 3
+            maximumValue: 5
             value: volumeRenderer.mode
 
             onValueChanged: {
