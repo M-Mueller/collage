@@ -1,5 +1,4 @@
 #include "Texture1D.h"
-#include "easylogging++.h"
 
 #include <QtGui/QColor>
 
@@ -78,7 +77,7 @@ namespace collage
         }
         else
         {
-            LOG(ERROR) << "Unsupported tpye";
+           qCritical("Unsupported tpye");
         }
     }
 
@@ -129,7 +128,7 @@ namespace collage
         {
             if(_tex->width() != _width || _tex->format() != format)
             {
-                LOG(INFO) << "Resizing Texture1D";
+                qDebug("Resizing Texture1D");
                 // resize the texture if the dimensions changed
                 _tex->bind();
                 _tex->resize(format, _width);
@@ -149,7 +148,7 @@ namespace collage
                 pixelFormat = GlTexture::PixelFormat::RGBA;
             else
             {
-                LOG(ERROR) << "Unsupported number of channels";
+                qCritical("Unsupported number of channels");
                 RendererElement::synchronize();
                 return;
             }
@@ -173,7 +172,7 @@ namespace collage
             case Depth24:
             case Depth32:
             case Depth32F:
-                LOG(ERROR) << "Unsupported Type";
+                qCritical("Unsupported Type");
                 RendererElement::synchronize();
                 return;
             }
@@ -203,7 +202,7 @@ namespace collage
         }
         else
         {
-            LOG(ERROR) << "Texture could not be attached";
+            qCritical("Texture could not be attached");
         }
     }
 

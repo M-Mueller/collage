@@ -10,8 +10,6 @@
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtQuick/QQuickWindow>
 
-#include "easylogging++.h"
-
 namespace collage
 {
     Renderer::Renderer():
@@ -67,10 +65,10 @@ namespace collage
             query.end();
             double elapsed = static_cast<double>(query.retrieve())/1e6;
             total += elapsed;
-            LOG(INFO) << pass->objectName() << " took " << elapsed << " ms";
+            qDebug("%s took %f ms", pass->objectName().toLatin1().data(), elapsed);
         }
 
-        LOG(INFO) << "Rendering took " << total << " ms";
+        qDebug("Rendering took %f ms", total);
 
         glPopDebugGroup();
 

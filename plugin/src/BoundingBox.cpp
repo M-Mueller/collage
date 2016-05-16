@@ -1,13 +1,13 @@
 #include "BoundingBox.h"
 
+#include <QtCore/QtDebug>
+
 #include <glue/GlVertexArray.h>
 #include <glue/GlVertexBuffer.h>
 #include <glue/GlIndexBuffer.h>
 #include <glue/GlProgram.h>
 
 #include <glad/glad.h>
-
-#include "easylogging++.h"
 
 namespace collage
 {
@@ -110,7 +110,7 @@ namespace collage
             }
             catch(...)
             {
-                LOG(ERROR) << "Failed to upload BoundingBox data";
+                qCritical("Failed to upload BoundingBox data");
                 _vao = nullptr;
                 _vertices = nullptr;
                 _indices = nullptr;

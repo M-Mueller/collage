@@ -9,8 +9,6 @@
 
 #include <glad/glad.h>
 
-#include "easylogging++.h"
-
 namespace collage
 {
     RenderPass::RenderPass(QObject* parent):
@@ -101,12 +99,12 @@ namespace collage
                 }
                 catch(std::exception e)
                 {
-                    LOG(ERROR) << "Failed to create program: " << e.what();
+                    qCritical("Failed to create program: %s", e.what());
                 }
             }
             else
             {
-                LOG(ERROR) << "Failed to load shader source";
+                qCritical("Failed to load shader source");
             }
         }
 

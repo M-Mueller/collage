@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/main.qml</file>
-        <file>Test.png</file>
-        <file>qml/VolumeRenderer.qml</file>
-        <file>qml/PopupMenu.qml</file>
-        <file>qml/TransferFunctionEditor.qml</file>
-    </qresource>
-</RCC>

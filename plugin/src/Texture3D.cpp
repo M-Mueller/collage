@@ -1,6 +1,5 @@
 #include "Texture3D.h"
 #include "Image.h"
-#include "easylogging++.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
@@ -95,7 +94,7 @@ namespace collage
             _update = false;
             if(_volume)
             {
-                LOG(INFO) << "Uploading Texture3D";
+                qDebug("Uploading Texture3D");
                 assert(width() == _volume->width());
                 assert(height() == _volume->height());
                 assert(depth() == _volume->depth());
@@ -111,7 +110,7 @@ namespace collage
             {
                 if(_tex->width() != _width || _tex->height() != _height || _tex->format() != format)
                 {
-                    LOG(INFO) << "Resizing Texture3D";
+                    qDebug("Resizing Texture3D");
                     // resize the texture if the dimensions changed
                     _tex->bind();
                     _tex->resize(format, _width, _height, _depth);

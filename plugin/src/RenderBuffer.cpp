@@ -1,5 +1,4 @@
 #include "RenderBuffer.h"
-#include "easylogging++.h"
 
 #include <glue/GlFrameBuffer.h>
 #include <glue/GlRenderBuffer.h>
@@ -44,18 +43,18 @@ namespace collage
         }
         else
         {
-            LOG(ERROR) << "Texture could not be attached";
+            qCritical("Texture could not be attached");
         }
     }
 
     void RenderBuffer::bind(int /*unit*/)
     {
-        LOG(ERROR) << "Renderbuffers cannot be used in BindTexture";
+       qFatal("Renderbuffers cannot be used in BindTexture");
     }
 
     void RenderBuffer::unbind(int /*unit*/)
     {
-        LOG(ERROR) << "Renderbuffers cannot be used in BindTexture";
+        qFatal("Renderbuffers cannot be used in BindTexture");
     }
 
     void RenderBuffer::synchronize()
@@ -102,7 +101,7 @@ namespace collage
         auto format = mapToFormat[std::make_pair(_channels, _type)];
         if(_buffer->width() != _width || _buffer->height() != _height || _buffer->format() != format)
         {
-            LOG(INFO) << "Resizing RenderBuffer";
+            qDebug("Resizing RenderBuffer");
             _buffer->bind();
             _buffer->resize(format, _width, _height);
             _buffer->release();

@@ -4,8 +4,6 @@
 
 #include <glue/GlProgram.h>
 
-#include "easylogging++.h"
-
 namespace collage
 {
     struct Octree::Node

@@ -1,8 +1,7 @@
 #include "ImageData.h"
 
+#include <limits>
 #include <cassert>
-
-#include "easylogging++.h"
 
 namespace collage
 {

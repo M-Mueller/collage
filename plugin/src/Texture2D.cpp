@@ -5,8 +5,6 @@
 
 #include <cassert>
 
-#include "easylogging++.h"
-
 namespace collage
 {
     Texture2D::Texture2D(QObject* parent):
@@ -120,7 +118,7 @@ namespace collage
         {
             if(_tex->width() != _width || _tex->height() != _height || _tex->format() != format)
             {
-                LOG(INFO) << "Resizing Texture2D";
+                qDebug("Resizing Texture2D");
                 // resize the texture if the dimensions changed
                 _tex->bind();
                 _tex->resize(format, _width, _height);
@@ -131,7 +129,7 @@ namespace collage
         {
             if(_tex->width() != _width || _tex->height() != _height || _tex->format() != format)
             {
-                LOG(INFO) << "Uploading Texture2D (source: " << _source << ")";
+                qDebug("Uploading Texture2D (source: %s)", _source.toLatin1().data());
                 assert(_sourceImage.width() == _width && _sourceImage.height() == _height);//TODO: rescale image
                 assert(_sourceImage.format() == QImage::Format_ARGB32 || _sourceImage.format() == QImage::Format_RGB32);
 
@@ -179,7 +177,7 @@ namespace collage
         }
         else
         {
-            LOG(ERROR) << "Texture could not be attached";
+            qCritical("Texture could not be attached");
         }
     }
 
@@ -206,12 +204,12 @@ namespace collage
 
         QImage img(source);
         if(!source.isEmpty() && img.isNull())
-            LOG(ERROR) << "Failed to load image: " << source;
+            qCritical("Failed to load image: %s", source.toLatin1().data());
 
         if(!img.isNull() && img.format() != QImage::Format_RGB32 && img.format() != QImage::Format_ARGB32)
         {
             // To make uploading easier, everything is converted to ARGB32
-            LOG(INFO) << "Converting '" << source << "' to ARGB32";
+            qDebug("Converting '%s' to ARGB32", source.toLatin1().data());
             _sourceImage = img.convertToFormat(QImage::Format_ARGB32);
         }
         else

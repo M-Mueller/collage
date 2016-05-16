@@ -6,8 +6,6 @@
 
 #include <cassert>
 
-#include "easylogging++.h"
-
 namespace collage
 {
     Image::Image(ImageData::Type type, int width, int height, int depth, int channels, QObject* parent):
@@ -98,7 +96,7 @@ namespace collage
         }
         else
         {
-            LOG(ERROR) << "Unknown extensions";
+            qCritical("Unknown extensions");
         }
         emit sourceChanged(source);
     }
@@ -150,11 +148,11 @@ namespace collage
 
     void Image::loadMHD(const QString& path)
     {
-        LOG(INFO) << "Loading " << path;
+        qInfo("Loading %s", path.toLatin1().data());
         QFile file(path);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            LOG(ERROR) << "Could not open file: " << path;
+            qCritical("Could not open file: %s", path.toLatin1().data());
             return;
         }
 
@@ -172,7 +170,7 @@ namespace collage
             bool ok;
             out = str.toInt(&ok);
             if(!ok)
-                LOG(ERROR) << "Invalid MHD tag (not a integer): " << str;
+                qCritical("Invalid MHD tag (not a integer): %s", str.toLatin1().data());
             return ok;
         };
 
@@ -181,7 +179,7 @@ namespace collage
             bool ok;
             out = str.toFloat(&ok);
             if(!ok)
-                LOG(ERROR) << "Invalid MHD tag (not a double): " << str;
+                qCritical("Invalid MHD tag (not a double): %s", str.toLatin1().data());
             return ok;
         };
 
@@ -196,7 +194,7 @@ namespace collage
             auto split = line.split('=');
             if(split.length() != 2)
             {
-                LOG(ERROR) << "Skipping invalid MHD tag (too many elements): " << line;
+                qCritical("Skipping invalid MHD tag (too many elements): %s", line.toLatin1().data());
                 continue;
             }
             auto token = split[0].trimmed();
@@ -229,7 +227,7 @@ namespace collage
                     type = ImageData::Float;
                 else
                 {
-                    LOG(ERROR) << "Unsupported type: " << value;
+                    qCritical("Unsupported type: %s", value.toLatin1().data());
                     return;
                 }
             }
@@ -249,22 +247,22 @@ namespace collage
 
         if(width <= 0)
         {
-            LOG(ERROR) << "Invalid or missing width: " << width;
+            qCritical("Invalid or missing width: %d", width);
             return;
         }
         if(height <= 0)
         {
-            LOG(ERROR) << "Invalid or missing height: " << height;
+            qCritical("Invalid or missing height: %d", height);
             return;
         }
         if(depth <= 0)
         {
-            LOG(ERROR) << "Invalid or missing depth: " << depth;
+            qCritical("Invalid or missing depth: %d", depth);
             return;
         }
         if(type == -1)
         {
-            LOG(ERROR) << "Missing type";
+            qCritical("Missing type");
             return;
         }
 
@@ -272,7 +270,7 @@ namespace collage
         QFile rawFile(rawPath);
         if(!rawFile.open(QIODevice::ReadOnly))
         {
-            LOG(ERROR) << "Could not open raw file: " << rawPath;
+            qCritical("Could not open raw file: %s", rawPath.toLatin1().data());
             return;
         }
 
@@ -283,20 +281,20 @@ namespace collage
             data = new char[static_cast<quint64>(byteSize)];
             if(rawFile.read(data, byteSize) == -1)
             {
-                LOG(ERROR) << "Failed to read data from file";
+                qCritical("Failed to read data from file");
                 return;
             }
             assert(rawFile.atEnd());
 
             if(byteSize != width*height*depth*channels*ImageData::typeSize(type))
             {
-                LOG(ERROR) << "Raw file has invalid size: " << byteSize << " (expected: " << width*height*depth*channels*ImageData::typeSize(type) << ")";
+                qCritical("Raw file has invalid size: %lld (expected: %lld)", byteSize, qint64(width)*height*depth*channels*ImageData::typeSize(type));
                 return;
             }
         }
         catch(std::bad_alloc)
         {
-            LOG(ERROR) << "Failed to allocate volume memory (" << byteSize << ")";
+            qCritical("Failed to allocate volume memory (%lld)", byteSize);
             return;
         }
 
@@ -324,7 +322,7 @@ namespace collage
         }
         catch(std::runtime_error e)
         {
-            LOG(ERROR) << "Failed to create Volume: " << e.what();
+            qCritical("Failed to create Volume: %s", e.what());
             return;
         }
 

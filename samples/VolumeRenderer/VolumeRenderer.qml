@@ -1,26 +1,5 @@
 import QtQuick 2.5 as QtQuick
-
-import Canvas 1.0
-import RenderPass 1.0
-import DepthFunc 1.0
-import CullMode 1.0
-import Texture 1.0
-import Texture1D 1.0
-import Texture2D 1.0
-import Texture3D 1.0
-import Camera 1.0
-import Framebuffer 1.0
-import RenderBuffer 1.0
-import TurnTableCamera 1.0
-import Rectangle 1.0
-import Cube 1.0
-import BoundingBox 1.0
-import Octree 1.0
-import ClearFramebuffer 1.0
-import Uniforms 1.0
-import UniformStruct 1.0
-import BindTexture 1.0
-import Image 1.0
+import collage 1.0
 
 Canvas {
     id: root
@@ -112,8 +91,8 @@ Canvas {
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayEntryPointsPass
-        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.vs"
-        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayEntry.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayEntry.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
 
@@ -176,8 +155,8 @@ Canvas {
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayExitPointsPass
-        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.vs"
-        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayEntry.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayEntry.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
 
@@ -220,8 +199,8 @@ Canvas {
 
     RenderPass {
         id: raycastingPass
-        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayCasting.vs"
-        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayCasting.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayCasting.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/samples/VolumeRenderer/glsl/RayCasting.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
         depthTest: false

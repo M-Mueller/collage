@@ -1,5 +1,4 @@
 #include "Uniforms.h"
-#include "easylogging++.h"
 
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
@@ -39,7 +38,7 @@ namespace collage
                     auto ustruct = value.value<UniformStruct*>();
                     if(!ustruct)
                     {
-                        LOG(ERROR) << "Unexpected QVariant type";
+                        qCritical("Unexpected QVariant type");
                         continue;
                     }
 
@@ -100,7 +99,7 @@ namespace collage
                 program.setUniform(name.toStdString(), value.value<QMatrix4x4>());
                 break;
             default:
-                LOG(WARNING) << "Uniform '" << name << "': Unsupported type";
+                qWarning("Uniform '%s': Unsupported type", name.toLatin1().data());
             }
         }
     }

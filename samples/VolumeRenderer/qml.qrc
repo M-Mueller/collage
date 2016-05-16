@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>VolumeRenderer.qml</file>
+        <file>PopupMenu.qml</file>
+        <file>TransferFunctionEditor.qml</file>
+    </qresource>
+    <qresource prefix="/glsl">
+        <file>glsl/Cube.fs</file>
+        <file>glsl/Cube.vs</file>
+        <file>glsl/Default.fs</file>
+        <file>glsl/Default.vs</file>
+        <file>glsl/RayCasting.fs</file>
+        <file>glsl/RayCasting.vs</file>
+        <file>glsl/RayEntry.fs</file>
+        <file>glsl/RayEntry.vs</file>
+        <file>glsl/Rectangle.fs</file>
+        <file>glsl/Rectangle.vs</file>
+    </qresource>
+</RCC>
