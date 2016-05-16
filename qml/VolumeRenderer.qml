@@ -1,6 +1,6 @@
 import QtQuick 2.5 as QtQuick
 
-import visualizationframebuffer 1.0
+import Canvas 1.0
 import RenderPass 1.0
 import DepthFunc 1.0
 import CullMode 1.0
@@ -22,7 +22,7 @@ import UniformStruct 1.0
 import BindTexture 1.0
 import Image 1.0
 
-VisualizationFramebuffer {
+Canvas {
     id: root
 
     transform: QtQuick.Scale { origin.x: width/2; origin.y: height/2; yScale: -1} // flip the whole image
@@ -112,8 +112,8 @@ VisualizationFramebuffer {
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayEntryPointsPass
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
 
@@ -176,8 +176,8 @@ VisualizationFramebuffer {
     // Determine the entry points of the rays by drawing a cube that has its coordinates as colors
     RenderPass {
         id: rayExitPointsPass
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayEntry.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayEntry.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
 
@@ -220,8 +220,8 @@ VisualizationFramebuffer {
 
     RenderPass {
         id: raycastingPass
-        vertexShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.vs"
-        fragmentShaderPath: "/home/markus/Projects/vis/glsl/RayCasting.fs"
+        vertexShaderPath: "/home/markus/Projects/collage/glsl/RayCasting.vs"
+        fragmentShaderPath: "/home/markus/Projects/collage/glsl/RayCasting.fs"
 
         viewport: Qt.rect(0, 0, root.width, root.height)
         depthTest: false

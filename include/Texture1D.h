@@ -7,40 +7,44 @@
 #include <QtCore/QVariant>
 
 class GlTexture1D;
-class Texture1D: public Texture
+
+namespace collage
 {
-    Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
+    class Texture1D: public Texture
+    {
+        Q_OBJECT
+        Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
 
-public:
+    public:
 
-    Texture1D(QObject* parent=0);
-    ~Texture1D();
+        Texture1D(QObject* parent=0);
+        ~Texture1D();
 
-    virtual void synchronize() override;
+        virtual void synchronize() override;
 
-    GlTexture1D* gl();
+        GlTexture1D* gl();
 
-    int width() const;
+        int width() const;
 
-public slots:
-    Q_INVOKABLE void load(const QList<QVariant>& data);
+    public slots:
+        Q_INVOKABLE void load(const QList<QVariant>& data);
 
-    void setWidth(int width);
+        void setWidth(int width);
 
-signals:
-    void widthChanged(int width);
+    signals:
+        void widthChanged(int width);
 
-protected:
-    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
-    void bind(int unit) override;
-    void unbind(int unit) override;
+    protected:
+        void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
+        void bind(int unit) override;
+        void unbind(int unit) override;
 
-private:
-    int _width;
+    private:
+        int _width;
 
-    GlTexture1D* _tex;
-    float* _data;
-};
+        GlTexture1D* _tex;
+        float* _data;
+    };
+}
 
 #endif // TEXTURE1D_H

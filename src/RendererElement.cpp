@@ -2,20 +2,23 @@
 
 #include <QtCore/QObject>
 
-RendererElement::~RendererElement()
+namespace collage
 {
-
-}
-
-void RendererElement::synchronize()
-{
-    if(auto qobject = dynamic_cast<QObject*>(this))
+    RendererElement::~RendererElement()
     {
-        for(auto child: qobject->children())
+
+    }
+
+    void RendererElement::synchronize()
+    {
+        if(auto qobject = dynamic_cast<QObject*>(this))
         {
-            if(auto subelement = dynamic_cast<RendererElement*>(child))
+            for(auto child: qobject->children())
             {
-                subelement->synchronize();
+                if(auto subelement = dynamic_cast<RendererElement*>(child))
+                {
+                    subelement->synchronize();
+                }
             }
         }
     }

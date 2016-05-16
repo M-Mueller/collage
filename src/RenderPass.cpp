@@ -11,328 +11,331 @@
 
 #include "easylogging++.h"
 
-RenderPass::RenderPass(QObject* parent):
-    QObject(parent),
-    _forceShaderReload(false),
-    _program(nullptr),
-    _renderToTexture(nullptr),
-    _enabled(true),
-    _viewport(QRect()),
-    _depthTest(false),
-    _depthFunc(DepthFunc::Less),
-    _cullMode(CullMode::None)
+namespace collage
 {
+    RenderPass::RenderPass(QObject* parent):
+        QObject(parent),
+        _forceShaderReload(false),
+        _program(nullptr),
+        _renderToTexture(nullptr),
+        _enabled(true),
+        _viewport(QRect()),
+        _depthTest(false),
+        _depthFunc(DepthFunc::Less),
+        _cullMode(CullMode::None)
+    {
 
-}
+    }
 
-RenderPass::~RenderPass()
-{
-    delete _program;
-}
-
-QString RenderPass::vertexShaderPath() const
-{
-    return _vertexShaderPath;
-}
-
-void RenderPass::setVertexShaderPath(const QString& vertexShaderPath)
-{
-    _vertexShaderPath = vertexShaderPath;
-}
-
-QString RenderPass::geometryShaderPath() const
-{
-    return _geometryShaderPath;
-}
-
-void RenderPass::setGeometryShaderPath(const QString& geometryShaderPath)
-{
-    _geometryShaderPath = geometryShaderPath;
-}
-
-QString RenderPass::fragmentShaderPath() const
-{
-    return _fragmentShaderPath;
-}
-
-void RenderPass::setFragmentShaderPath(const QString& fragmentShaderPath)
-{
-    _fragmentShaderPath = fragmentShaderPath;
-}
-
-void RenderPass::synchronize()
-{
-    if(_forceShaderReload)
+    RenderPass::~RenderPass()
     {
         delete _program;
-        _program = nullptr;
-        _forceShaderReload = false;
     }
 
-    if(!_program)
+    QString RenderPass::vertexShaderPath() const
     {
-        QString vsSrc, gsSrc, fsSrc;
+        return _vertexShaderPath;
+    }
 
-        QFile vs(_vertexShaderPath);
-        if(vs.open(QIODevice::ReadOnly | QIODevice::Text))
-            vsSrc = vs.readAll();
+    void RenderPass::setVertexShaderPath(const QString& vertexShaderPath)
+    {
+        _vertexShaderPath = vertexShaderPath;
+    }
 
-        if(!_geometryShaderPath.isEmpty())
+    QString RenderPass::geometryShaderPath() const
+    {
+        return _geometryShaderPath;
+    }
+
+    void RenderPass::setGeometryShaderPath(const QString& geometryShaderPath)
+    {
+        _geometryShaderPath = geometryShaderPath;
+    }
+
+    QString RenderPass::fragmentShaderPath() const
+    {
+        return _fragmentShaderPath;
+    }
+
+    void RenderPass::setFragmentShaderPath(const QString& fragmentShaderPath)
+    {
+        _fragmentShaderPath = fragmentShaderPath;
+    }
+
+    void RenderPass::synchronize()
+    {
+        if(_forceShaderReload)
         {
-            QFile gs(_geometryShaderPath);
-            if(gs.open(QIODevice::ReadOnly | QIODevice::Text))
-                gsSrc = gs.readAll();
+            delete _program;
+            _program = nullptr;
+            _forceShaderReload = false;
         }
 
-        QFile fs(_fragmentShaderPath);
-        if(fs.open(QIODevice::ReadOnly | QIODevice::Text))
-            fsSrc = fs.readAll();
-
-        if(!vsSrc.isEmpty() && !fsSrc.isEmpty())
+        if(!_program)
         {
-            try
+            QString vsSrc, gsSrc, fsSrc;
+
+            QFile vs(_vertexShaderPath);
+            if(vs.open(QIODevice::ReadOnly | QIODevice::Text))
+                vsSrc = vs.readAll();
+
+            if(!_geometryShaderPath.isEmpty())
             {
-                if(gsSrc.isEmpty())
-                    _program = new GlProgram(vsSrc.toStdString(), fsSrc.toStdString());
-                else
-                    _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
+                QFile gs(_geometryShaderPath);
+                if(gs.open(QIODevice::ReadOnly | QIODevice::Text))
+                    gsSrc = gs.readAll();
             }
-            catch(std::exception e)
+
+            QFile fs(_fragmentShaderPath);
+            if(fs.open(QIODevice::ReadOnly | QIODevice::Text))
+                fsSrc = fs.readAll();
+
+            if(!vsSrc.isEmpty() && !fsSrc.isEmpty())
             {
-                LOG(ERROR) << "Failed to create program: " << e.what();
+                try
+                {
+                    if(gsSrc.isEmpty())
+                        _program = new GlProgram(vsSrc.toStdString(), fsSrc.toStdString());
+                    else
+                        _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
+                }
+                catch(std::exception e)
+                {
+                    LOG(ERROR) << "Failed to create program: " << e.what();
+                }
+            }
+            else
+            {
+                LOG(ERROR) << "Failed to load shader source";
+            }
+        }
+
+        _enabled.synchronize();
+        _viewport.synchronize();
+        _depthTest.synchronize();
+        _depthFunc.synchronize();
+        _cullMode.synchronize();
+
+        RendererElement::synchronize();
+    }
+
+    void RenderPass::render()
+    {
+        if(!_program || !_enabled.gl())
+            return;
+
+        GLint prevFBO = 0;
+        GLint prevViewport[4];
+        if(_renderToTexture)
+        {
+            // backup current configuration
+            glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
+            glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+            // bind framebuffer and set viewport to render to complete texture
+            _renderToTexture->gl()->bind();
+            glViewport(_viewport.gl().x(), _viewport.gl().y(), _viewport.gl().width(), _viewport.gl().height());
+        }
+
+        if(_depthTest.gl())
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+        GLenum depthFunc = GL_LESS;
+        switch(_depthFunc)
+        {
+        case DepthFunc::Never:
+            depthFunc = GL_NEVER;
+            break;
+        case DepthFunc::Always:
+            depthFunc = GL_ALWAYS;
+            break;
+        case DepthFunc::Less:
+            depthFunc = GL_LESS;
+            break;
+        case DepthFunc::LessEqual:
+            depthFunc = GL_LEQUAL;
+            break;
+        case DepthFunc::Greater:
+            depthFunc = GL_GREATER;
+            break;
+        case DepthFunc::GreaterEqual:
+            depthFunc = GL_GEQUAL;
+            break;
+        case DepthFunc::Equal:
+            depthFunc = GL_EQUAL;
+            break;
+        case DepthFunc::NotEqual:
+            depthFunc = GL_NOTEQUAL;
+            break;
+        }
+        glDepthFunc(depthFunc);
+
+        if(_cullMode.gl() != CullMode::None)
+        {
+            glEnable(GL_CULL_FACE);
+            if(_cullMode.gl() == CullMode::Front)
+            {
+                glCullFace(GL_FRONT);
+            }
+            else
+            {
+               glCullFace(GL_BACK);
             }
         }
         else
         {
-            LOG(ERROR) << "Failed to load shader source";
+            glDisable(GL_CULL_FACE);
         }
-    }
 
-    _enabled.synchronize();
-    _viewport.synchronize();
-    _depthTest.synchronize();
-    _depthFunc.synchronize();
-    _cullMode.synchronize();
+        _program->activate();
 
-    RendererElement::synchronize();
-}
-
-void RenderPass::render()
-{
-    if(!_program || !_enabled.gl())
-        return;
-
-    GLint prevFBO = 0;
-    GLint prevViewport[4];
-    if(_renderToTexture)
-    {
-        // backup current configuration
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
-        glGetIntegerv(GL_VIEWPORT, prevViewport);
-
-        // bind framebuffer and set viewport to render to complete texture
-        _renderToTexture->gl()->bind();
-        glViewport(_viewport.gl().x(), _viewport.gl().y(), _viewport.gl().width(), _viewport.gl().height());
-    }
-
-    if(_depthTest.gl())
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
-    GLenum depthFunc = GL_LESS;
-    switch(_depthFunc)
-    {
-    case DepthFunc::Never:
-        depthFunc = GL_NEVER;
-        break;
-    case DepthFunc::Always:
-        depthFunc = GL_ALWAYS;
-        break;
-    case DepthFunc::Less:
-        depthFunc = GL_LESS;
-        break;
-    case DepthFunc::LessEqual:
-        depthFunc = GL_LEQUAL;
-        break;
-    case DepthFunc::Greater:
-        depthFunc = GL_GREATER;
-        break;
-    case DepthFunc::GreaterEqual:
-        depthFunc = GL_GEQUAL;
-        break;
-    case DepthFunc::Equal:
-        depthFunc = GL_EQUAL;
-        break;
-    case DepthFunc::NotEqual:
-        depthFunc = GL_NOTEQUAL;
-        break;
-    }
-    glDepthFunc(depthFunc);
-
-    if(_cullMode.gl() != CullMode::None)
-    {
-        glEnable(GL_CULL_FACE);
-        if(_cullMode.gl() == CullMode::Front)
+        for(auto entity: _entities)
         {
-            glCullFace(GL_FRONT);
+            entity->render(*_program);
         }
-        else
+
+        for(auto entity = _entities.rbegin(); entity != _entities.rend(); ++entity)
         {
-           glCullFace(GL_BACK);
+            (*entity)->resetStates(*_program);
         }
-    }
-    else
-    {
-        glDisable(GL_CULL_FACE);
-    }
 
-    _program->activate();
+        _program->deactivate();
 
-    for(auto entity: _entities)
-    {
-        entity->render(*_program);
-    }
-
-    for(auto entity = _entities.rbegin(); entity != _entities.rend(); ++entity)
-    {
-        (*entity)->resetStates(*_program);
-    }
-
-    _program->deactivate();
-
-    if(_renderToTexture)
-    {
-        // restore previous viewport
-        glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
-        glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
-    }
-}
-
-QQmlListProperty<Entity> RenderPass::entities()
-{
-    return QQmlListProperty<Entity>(this, 0, &RenderPass::appendEntity, &RenderPass::entityCount,
-                                    &RenderPass::entityAt, &RenderPass::clearEntities);
-}
-
-
-void RenderPass::appendEntity(QQmlListProperty<Entity>* list, Entity* value)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
-    {
-        if(!pass->_entities.contains(value))
+        if(_renderToTexture)
         {
-            pass->_entities.append(value);
+            // restore previous viewport
+            glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+            glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
         }
     }
-}
 
-Entity* RenderPass::entityAt(QQmlListProperty<Entity>* list, int index)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    QQmlListProperty<Entity> RenderPass::entities()
     {
-        return pass->_entities.value(index, nullptr);
+        return QQmlListProperty<Entity>(this, 0, &RenderPass::appendEntity, &RenderPass::entityCount,
+                                        &RenderPass::entityAt, &RenderPass::clearEntities);
     }
-    return nullptr;
-}
 
-void RenderPass::clearEntities(QQmlListProperty<Entity>* list)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+
+    void RenderPass::appendEntity(QQmlListProperty<Entity>* list, Entity* value)
     {
-        pass->_entities.clear();
+        if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+        {
+            if(!pass->_entities.contains(value))
+            {
+                pass->_entities.append(value);
+            }
+        }
     }
-}
 
-int RenderPass::entityCount(QQmlListProperty<Entity>* list)
-{
-    if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+    Entity* RenderPass::entityAt(QQmlListProperty<Entity>* list, int index)
     {
-        return pass->_entities.count();
+        if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+        {
+            return pass->_entities.value(index, nullptr);
+        }
+        return nullptr;
     }
-    return 0;
-}
 
-bool RenderPass::depthTest() const
-{
-    return _depthTest;
-}
+    void RenderPass::clearEntities(QQmlListProperty<Entity>* list)
+    {
+        if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+        {
+            pass->_entities.clear();
+        }
+    }
 
-bool RenderPass::enabled() const
-{
-    return _enabled;
-}
+    int RenderPass::entityCount(QQmlListProperty<Entity>* list)
+    {
+        if(RenderPass* pass = qobject_cast<RenderPass*>(list->object))
+        {
+            return pass->_entities.count();
+        }
+        return 0;
+    }
 
-CullMode::Enum RenderPass::cullMode() const
-{
-    return _cullMode;
-}
+    bool RenderPass::depthTest() const
+    {
+        return _depthTest;
+    }
 
-DepthFunc::Enum RenderPass::depthFunc() const
-{
-    return _depthFunc;
-}
+    bool RenderPass::enabled() const
+    {
+        return _enabled;
+    }
 
-QRect RenderPass::viewport() const
-{
-    return _viewport;
-}
+    CullMode::Enum RenderPass::cullMode() const
+    {
+        return _cullMode;
+    }
 
-void RenderPass::setViewport(const QRect& viewport)
-{
-    if(_viewport == viewport)
-        return;
+    DepthFunc::Enum RenderPass::depthFunc() const
+    {
+        return _depthFunc;
+    }
 
-    _viewport = viewport;
-    emit viewportChanged(viewport);
-}
+    QRect RenderPass::viewport() const
+    {
+        return _viewport;
+    }
 
-void RenderPass::reloadShaders()
-{
-    _forceShaderReload = true;
-}
+    void RenderPass::setViewport(const QRect& viewport)
+    {
+        if(_viewport == viewport)
+            return;
 
-void RenderPass::setCullMode(CullMode::Enum cullMode)
-{
-    if (_cullMode == cullMode)
-        return;
+        _viewport = viewport;
+        emit viewportChanged(viewport);
+    }
 
-    _cullMode = cullMode;
-    emit cullModeChanged(cullMode);
-}
+    void RenderPass::reloadShaders()
+    {
+        _forceShaderReload = true;
+    }
 
-void RenderPass::setEnabled(bool enabled)
-{
-    if (_enabled == enabled)
-        return;
+    void RenderPass::setCullMode(CullMode::Enum cullMode)
+    {
+        if (_cullMode == cullMode)
+            return;
 
-    _enabled = enabled;
-    emit enabledChanged(enabled);
-}
+        _cullMode = cullMode;
+        emit cullModeChanged(cullMode);
+    }
 
-void RenderPass::setDepthTest(bool depthTest)
-{
-    if(_depthTest == depthTest)
-        return;
+    void RenderPass::setEnabled(bool enabled)
+    {
+        if (_enabled == enabled)
+            return;
 
-    _depthTest = depthTest;
-    emit depthTestChanged(depthTest);
-}
+        _enabled = enabled;
+        emit enabledChanged(enabled);
+    }
 
-void RenderPass::setDepthFunc(DepthFunc::Enum depthFunc)
-{
-    if (_depthFunc == depthFunc)
-        return;
+    void RenderPass::setDepthTest(bool depthTest)
+    {
+        if(_depthTest == depthTest)
+            return;
 
-    _depthFunc = depthFunc;
-    emit depthFuncChanged(depthFunc);
-}
+        _depthTest = depthTest;
+        emit depthTestChanged(depthTest);
+    }
 
-Framebuffer* RenderPass::renderToTexture() const
-{
-    return _renderToTexture;
-}
+    void RenderPass::setDepthFunc(DepthFunc::Enum depthFunc)
+    {
+        if (_depthFunc == depthFunc)
+            return;
 
-void RenderPass::setRenderToTexture(Framebuffer* renderToTexture)
-{
-    _renderToTexture = renderToTexture;
+        _depthFunc = depthFunc;
+        emit depthFuncChanged(depthFunc);
+    }
+
+    Framebuffer* RenderPass::renderToTexture() const
+    {
+        return _renderToTexture;
+    }
+
+    void RenderPass::setRenderToTexture(Framebuffer* renderToTexture)
+    {
+        _renderToTexture = renderToTexture;
+    }
 }

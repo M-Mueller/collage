@@ -4,7 +4,7 @@
 
 #include "easylogging++.h"
 
-#include "VisualizationFramebuffer.h"
+#include "Canvas.h"
 #include "RenderPass.h"
 #include "Texture.h"
 #include "Texture1D.h"
@@ -29,35 +29,36 @@ INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[])
 {
+    using namespace collage;
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<VisualizationFramebuffer>("visualizationframebuffer", 1, 0, "VisualizationFramebuffer");
-    qmlRegisterType<RenderPass>("RenderPass", 1, 0, "RenderPass");
-    qmlRegisterUncreatableType<DepthFunc>("DepthFunc", 1, 0, "DepthFunc", "DepthFunc is an enum");
-    qmlRegisterUncreatableType<CullMode>("CullMode", 1, 0, "CullMode", "CullMode is an enum");
+    qmlRegisterType<collage::Canvas>("Canvas", 1, 0, "Canvas");
+    qmlRegisterType<collage::RenderPass>("RenderPass", 1, 0, "RenderPass");
+    qmlRegisterUncreatableType<collage::DepthFunc>("DepthFunc", 1, 0, "DepthFunc", "DepthFunc is an enum");
+    qmlRegisterUncreatableType<collage::CullMode>("CullMode", 1, 0, "CullMode", "CullMode is an enum");
 
-    qmlRegisterUncreatableType<Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
-    qmlRegisterType<Texture1D>("Texture1D", 1, 0, "Texture1D");
-    qmlRegisterType<Texture2D>("Texture2D", 1, 0, "Texture2D");
-    qmlRegisterType<Texture3D>("Texture3D", 1, 0, "Texture3D");
+    qmlRegisterUncreatableType<collage::Texture>("Texture", 1, 0, "Texture", "Texture is abstract");
+    qmlRegisterType<collage::Texture1D>("Texture1D", 1, 0, "Texture1D");
+    qmlRegisterType<collage::Texture2D>("Texture2D", 1, 0, "Texture2D");
+    qmlRegisterType<collage::Texture3D>("Texture3D", 1, 0, "Texture3D");
 
-    qmlRegisterType<Image>("Image", 1, 0, "Image");
+    qmlRegisterType<collage::Image>("Image", 1, 0, "Image");
 
-    qmlRegisterType<Framebuffer>("Framebuffer", 1, 0, "Framebuffer");
-    qmlRegisterType<RenderBuffer>("RenderBuffer", 1, 0, "RenderBuffer");
+    qmlRegisterType<collage::Framebuffer>("Framebuffer", 1, 0, "Framebuffer");
+    qmlRegisterType<collage::RenderBuffer>("RenderBuffer", 1, 0, "RenderBuffer");
 
-    qmlRegisterType<Camera>("Camera", 1, 0, "Camera");
-    qmlRegisterType<TurnTableCamera>("TurnTableCamera", 1, 0, "TurnTableCamera");
+    qmlRegisterType<collage::Camera>("Camera", 1, 0, "Camera");
+    qmlRegisterType<collage::TurnTableCamera>("TurnTableCamera", 1, 0, "TurnTableCamera");
 
-    qmlRegisterUncreatableType<Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
-    qmlRegisterType<Rectangle>("Rectangle", 1, 0, "Rectangle");
-    qmlRegisterType<Cube>("Cube", 1, 0, "Cube");
-    qmlRegisterType<BoundingBox>("BoundingBox", 1, 0, "BoundingBox");
-    qmlRegisterType<Octree>("Octree", 1, 0, "Octree");
-    qmlRegisterType<ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
-    qmlRegisterType<Uniforms>("Uniforms", 1, 0, "Uniforms");
-    qmlRegisterType<UniformStruct>("UniformStruct", 1, 0, "UniformStruct");
-    qmlRegisterType<BindTexture>("BindTexture", 1, 0, "BindTexture");
+    qmlRegisterUncreatableType<collage::Entity>("Entity", 1, 0, "Entity", "Entity is abstract");
+    qmlRegisterType<collage::Rectangle>("Rectangle", 1, 0, "Rectangle");
+    qmlRegisterType<collage::Cube>("Cube", 1, 0, "Cube");
+    qmlRegisterType<collage::BoundingBox>("BoundingBox", 1, 0, "BoundingBox");
+    qmlRegisterType<collage::Octree>("Octree", 1, 0, "Octree");
+    qmlRegisterType<collage::ClearFramebuffer>("ClearFramebuffer", 1, 0, "ClearFramebuffer");
+    qmlRegisterType<collage::Uniforms>("Uniforms", 1, 0, "Uniforms");
+    qmlRegisterType<collage::UniformStruct>("UniformStruct", 1, 0, "UniformStruct");
+    qmlRegisterType<collage::BindTexture>("BindTexture", 1, 0, "BindTexture");
 
     qmlRegisterType<PopOver>("PopOver", 1, 0, "PopOver");
 

@@ -6,37 +6,40 @@
 
 #include <memory>
 
-class Image;
-class BoundingBox;
-
-class Octree : public Entity
+namespace collage
 {
-    Q_OBJECT
-    Q_PROPERTY(Image* volume READ volume WRITE setVolume NOTIFY volumeChanged)
+    class Image;
+    class BoundingBox;
 
-public:
-    Octree(QObject* parent=0);
-    virtual ~Octree();
+    class Octree : public Entity
+    {
+        Q_OBJECT
+        Q_PROPERTY(collage::Image* volume READ volume WRITE setVolume NOTIFY volumeChanged)
 
-    void synchronize() override;
-    void render(GlProgram& program) override;
+    public:
+        Octree(QObject* parent=0);
+        virtual ~Octree();
 
-    Image* volume() const;
+        void synchronize() override;
+        void render(GlProgram& program) override;
 
-public slots:
-    void setVolume(Image* volume);
-    void compute();
+        Image* volume() const;
 
-signals:
-    void volumeChanged(Image* volume);
-    void completed();
+    public slots:
+        void setVolume(Image* volume);
+        void compute();
 
-private:
-    Image* _volume;
+    signals:
+        void volumeChanged(Image* volume);
+        void completed();
 
-    struct Node;
-    typedef std::unique_ptr<Node> NodePtr;
-    NodePtr _root;
-};
+    private:
+        Image* _volume;
+
+        struct Node;
+        typedef std::unique_ptr<Node> NodePtr;
+        NodePtr _root;
+    };
+}
 
 #endif // OCTREE_H

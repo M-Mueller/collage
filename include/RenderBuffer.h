@@ -4,34 +4,37 @@
 #include "Texture.h"
 
 class GlRenderBuffer;
-class RenderBuffer: public Texture
+namespace collage
 {
-    Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setWidth)
-    Q_PROPERTY(int height READ height WRITE setHeight)
-public:
-    RenderBuffer(QObject* parent=0);
-    virtual ~RenderBuffer();
+    class RenderBuffer: public Texture
+    {
+        Q_OBJECT
+        Q_PROPERTY(int width READ width WRITE setWidth)
+        Q_PROPERTY(int height READ height WRITE setHeight)
+    public:
+        RenderBuffer(QObject* parent=0);
+        virtual ~RenderBuffer();
 
-    int width() const;
-    int height() const;
+        int width() const;
+        int height() const;
 
-    void synchronize();
+        void synchronize();
 
-public slots:
-    void setWidth(int width);
-    void setHeight(int height);
+    public slots:
+        void setWidth(int width);
+        void setHeight(int height);
 
-protected:
-    void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
-    void bind(int unit) override;
-    void unbind(int unit) override;
+    protected:
+        void attachTo(Framebuffer& fbo, Framebuffer::Attachment pos) override;
+        void bind(int unit) override;
+        void unbind(int unit) override;
 
-private:
-    int _width;
-    int _height;
+    private:
+        int _width;
+        int _height;
 
-    GlRenderBuffer* _buffer;
-};
+        GlRenderBuffer* _buffer;
+    };
+}
 
 #endif // RENDERBUFFER_H

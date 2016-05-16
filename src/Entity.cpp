@@ -1,17 +1,20 @@
 #include "Entity.h"
 
-Entity::Entity(QObject* parent):
-    QObject(parent)
+namespace collage
 {
+    Entity::Entity(QObject* parent):
+        QObject(parent)
+    {
 
-}
+    }
 
-Entity::~Entity()
-{
+    Entity::~Entity()
+    {
 
-}
+    }
 
-void Entity::resetStates(GlProgram& /*program*/)
-{
+    void Entity::resetStates(GlProgram& /*program*/)
+    {
 
+    }
 }

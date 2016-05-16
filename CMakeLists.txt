@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-project(vis)
+project(collage)
 
 option(BUILD_DOCUMENTATION "Generate Doxygen documentation" OFF)
 
@@ -29,8 +29,8 @@ set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
     src/main.cpp
-    src/VisualizationFramebuffer.cpp
-    src/VisualizationRenderer.cpp
+    src/Canvas.cpp
+    src/Renderer.cpp
     src/RendererElement.cpp
     src/RenderPass.cpp
     src/Texture.cpp
@@ -55,8 +55,8 @@ set(SOURCES
 )
 
 set(HEADERS
-    include/VisualizationFramebuffer.h
-    include/VisualizationRenderer.h
+    include/Canvas.h
+    include/Renderer.h
     include/RendererElement.h
     include/RendererProperty.h
     include/RenderPass.h
@@ -91,6 +91,6 @@ set(QML
 qt5_add_resources(RESOURCES qml.qrc)
 
 include_directories(include glue/include)
-add_executable(vis ${SOURCES} ${HEADERS} ${RESOURCES} ${QML})
-target_link_libraries(vis glue -ldl -lpng)
-qt5_use_modules(vis Core Gui Qml Quick)
+add_executable(collage ${SOURCES} ${HEADERS} ${RESOURCES} ${QML})
+target_link_libraries(collage glue -ldl -lpng)
+qt5_use_modules(collage Core Gui Qml Quick)
