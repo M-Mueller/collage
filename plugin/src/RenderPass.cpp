@@ -97,7 +97,7 @@ namespace collage
                     else
                         _program = new GlProgram(vsSrc.toStdString(), gsSrc.toStdString(), fsSrc.toStdString());
                 }
-                catch(std::exception e)
+                catch(std::runtime_error e)
                 {
                     qCritical("Failed to create program: %s", e.what());
                 }

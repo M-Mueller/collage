@@ -5,6 +5,8 @@
 #include <glue/GlTexture2D.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <memory>
+
 namespace collage
 {
     Rectangle::Rectangle(QObject* parent):
