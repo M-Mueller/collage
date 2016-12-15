@@ -26,6 +26,7 @@ set(CMAKE_AUTOMOC ON)
 add_definitions(-DELPP_QT_LOGGING)
 
 include_directories(../glue/include)
+include_directories(${CMAKE_BINARY_DIR}/glue/include)
 include_directories(include)
 
 set(SOURCES
