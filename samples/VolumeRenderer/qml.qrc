@@ -17,4 +17,7 @@
         <file>glsl/Rectangle.fs</file>
         <file>glsl/Rectangle.vs</file>
     </qresource>
+    <qresource prefix="/images">
+        <file>ExpanderIcon.png</file>
+    </qresource>
 </RCC>

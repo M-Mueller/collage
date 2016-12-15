@@ -28,8 +28,8 @@ qt5_use_modules(VolumeRenderer Core Gui Qml Quick)
 
 # Qt searches for plugins next to executable
 add_custom_target(CopyPlugin ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/collage"
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:collage-plugin> "${CMAKE_CURRENT_BINARY_DIR}/collage"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/plugin/qmldir" "${CMAKE_CURRENT_BINARY_DIR}/collage"
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/collage"
+	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:collage-plugin> "${CMAKE_CURRENT_BINARY_DIR}/collage"
+	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/plugin/qmldir" "${CMAKE_CURRENT_BINARY_DIR}/collage"
 )
 add_dependencies(VolumeRenderer CopyPlugin)
