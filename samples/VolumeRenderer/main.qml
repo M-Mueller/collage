@@ -2,6 +2,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
+import TransferFunctionEditor 1.0
 
 ApplicationWindow {
 	id: applicationWindow1
@@ -97,9 +98,10 @@ ApplicationWindow {
 				anchors.fill: parent
 				anchors.margins: 8
 
+				opacity: 0.6
+
 				onTransferFunctionChanged: {
-					var tf = tfEditor.transferFunction(volumeRenderer.transferFunction.width)
-					volumeRenderer.transferFunction.load(tf)
+					volumeRenderer.transferFunction.load(transferFunction)
 					volumeRenderer.update()
 				}
 			}

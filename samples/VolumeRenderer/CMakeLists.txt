@@ -5,19 +5,20 @@ find_package(Qt5Quick)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCES
-    main.cpp
-    PopOver.cpp
+	main.cpp
+	PopOver.cpp
+	TransferFunctionEditor.cpp
 )
 
 set(HEADERS
-    PopOver.h
+	PopOver.h
+	TransferFunctionEditor.h
 )
 
 set(QML
-    main.qml
-    VolumeRenderer.qml
-    TransferFunctionEditor.qml
-    PopupMenu.qml
+	main.qml
+	VolumeRenderer.qml
+	PopupMenu.qml
 )
 
 qt5_add_resources(RESOURCES qml.qrc)

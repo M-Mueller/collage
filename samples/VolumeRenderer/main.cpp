@@ -4,27 +4,29 @@
 #include <QtQuick/QQuickView>
 
 #include "PopOver.h"
+#include "TransferFunctionEditor.h"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+	QGuiApplication app(argc, argv);
 
-    qmlRegisterType<PopOver>("PopOver", 1, 0, "PopOver");
+	qmlRegisterType<PopOver>("PopOver", 1, 0, "PopOver");
+	qmlRegisterType<TransferFunctionEditor>("TransferFunctionEditor", 1, 0, "TransferFunctionEditor");
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    for (auto obj: engine.rootObjects())
-    {
-        if (auto win = dynamic_cast<QWindow*>(obj))
-        {
-            QSurfaceFormat fmt = win->format();
-            fmt.setVersion(3, 3);
-            fmt.setProfile(QSurfaceFormat::CoreProfile);
+	QQmlApplicationEngine engine;
+	engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+	for (auto obj: engine.rootObjects())
+	{
+		if (auto win = dynamic_cast<QWindow*>(obj))
+		{
+			QSurfaceFormat fmt = win->format();
+			fmt.setVersion(3, 3);
+			fmt.setProfile(QSurfaceFormat::CoreProfile);
 
-            win->setFormat(fmt);
-        }
-    }
+			win->setFormat(fmt);
+		}
+	}
 
-    return app.exec();
+	return app.exec();
 }
 
