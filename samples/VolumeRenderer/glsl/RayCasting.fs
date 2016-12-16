@@ -92,22 +92,21 @@ bool computeShadow(vec3 pos)
     ray.direction = normalize(light.position - pos);
     ray.terminate = false;
 
-    float shadowStep = 2*step; // no accurate hit required
     // start one step away from the already hit iso surface
-    ray.position += shadowStep*ray.direction;
+    ray.position += step*ray.direction;
 
-    int numSteps = int(length(light.position - pos)/shadowStep);
+    int numSteps = int(length(light.position - pos)/step);
     for(int i=0; i<numSteps; ++i)
     {
         vec3 voxelPos = worldToVoxel(ray.position);
         if(any(lessThan(voxelPos, vec3(0.0))) || any(greaterThan(voxelPos, vec3(1.0))))
             return false;
 
-        float value = getValue(voxelPos);
+        float value = getValue(ray.position);
         if(value >= iso)
             return true;
 
-        ray.position += shadowStep*ray.direction;
+        ray.position += step*ray.direction;
     }
     return false;
 }
