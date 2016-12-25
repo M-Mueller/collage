@@ -3,6 +3,7 @@
         <file>main.qml</file>
         <file>VolumeRenderer.qml</file>
         <file>PopupMenu.qml</file>
+        <file>TransferFunctionColorPicker.qml</file>
     </qresource>
     <qresource prefix="/glsl">
         <file>glsl/Cube.fs</file>

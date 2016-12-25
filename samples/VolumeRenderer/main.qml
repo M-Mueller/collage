@@ -104,6 +104,29 @@ ApplicationWindow {
 					volumeRenderer.transferFunction.load(transferFunction)
 					volumeRenderer.update()
 				}
+
+				Component {
+					id: colorPicker
+					TransferFunctionColorPicker {
+						anchors.fill: parent
+					}
+				}
+
+				onControlPointClicked: {
+					var component = Qt.createComponent("PopupMenu.qml")
+					var popup = component.createObject(null)
+					popup.content.sourceComponent = colorPicker
+					popup.parentItem = this
+					popup.origin = origin
+					popup.show()
+
+					popup.finished.connect(function(result) {
+						if (result === "remove")
+							tfEditor.removeControlPoint(controlPoint)
+						else
+							tfEditor.setControlPointColor(controlPoint, result)
+					});
+				}
 			}
 
 			Rectangle {

@@ -19,6 +19,7 @@ set(QML
 	main.qml
 	VolumeRenderer.qml
 	PopupMenu.qml
+	TransferFunctionColorPicker.qml
 )
 
 qt5_add_resources(RESOURCES qml.qrc)
