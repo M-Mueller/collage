@@ -23,9 +23,11 @@ void TransferFunctionEditor::ControlPoint::setAbsPos(QPointF p)
 
 TransferFunctionEditor::TransferFunctionEditor(QQuickItem* parent):
 	QQuickPaintedItem(parent),
-	_controlPointRadius(5),
 	_numSamples(256),
-	_draggedControlPoint(-1)
+	_draggedControlPoint(-1),
+	_controlPointRadius(5),
+	_minDragDistance(2),
+	_minNumberOfPoints(2)
 {
 	connect(this, &TransferFunctionEditor::transferFunctionChanged, this, [this]()
 	{
@@ -92,6 +94,7 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent* event)
 	_dragShape = false;
 	_dragStart = event->pos();
 	_dragStartControlPoints = _controlPoints;
+	_dragMoved = false;
 
 	assert(_controlPoints.size() >= 2);
 	if (event->button() == Qt::LeftButton)
@@ -131,8 +134,14 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent* event)
 	assert(!(_draggedControlPoint != -1 && _dragShape));
 	if (_draggedControlPoint != -1)
 	{
+		// only start dragging after a certain distance is covered (i.e. to compensate mouse jitter when clicking)
+		if (!_dragMoved && (_dragStart - event->pos()).manhattanLength() < _minDragDistance)
+			return;
+		_dragMoved = true;
+
 		auto& cp = _controlPoints[_draggedControlPoint];
 		cp.setAbsPos(event->pos());
+		_draggedControlPoint = reorderControlPoint(_draggedControlPoint);
 		event->accept();
 		updateTransferFunction();
 	}
@@ -155,6 +164,11 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent* event)
 
 void TransferFunctionEditor::mouseReleaseEvent(QMouseEvent* /*event*/)
 {
+	if (!_dragMoved && _draggedControlPoint != -1)
+	{
+		// interpret as clicked if not moved
+		emit controlPointClicked(_draggedControlPoint, _dragStart);
+	}
 	_draggedControlPoint = -1;
 	_dragShape = false;
 }
@@ -239,6 +253,27 @@ void TransferFunctionEditor::addControlPoint(double pos, double alpha, QColor co
 	updateTransferFunction();
 }
 
+void TransferFunctionEditor::removeControlPoint(int controlPoint)
+{
+	if (controlPoint >= 0 && controlPoint < _controlPoints.count())
+	{
+		if (_controlPoints.count() > _minNumberOfPoints)
+		{
+			_controlPoints.remove(controlPoint);
+			updateTransferFunction();
+		}
+	}
+}
+
+void TransferFunctionEditor::setControlPointColor(int controlPoint, QColor color)
+{
+	if (controlPoint >= 0 && controlPoint < _controlPoints.count())
+	{
+		_controlPoints[controlPoint].color = color;
+		updateTransferFunction();
+	}
+}
+
 void TransferFunctionEditor::updateTransferFunction()
 {
 	_transferFunction = QList<QVariant>::fromVector(QVector<QVariant>(_numSamples, QVariant::fromValue(QColor(0, 0, 0, 0))));
@@ -275,4 +310,29 @@ void TransferFunctionEditor::updateTransferFunction()
 
 	update();
 	emit transferFunctionChanged(_transferFunction);
+}
+
+int TransferFunctionEditor::reorderControlPoint(int controlPointIndex)
+{
+	if (controlPointIndex <= 0 || controlPointIndex >= _controlPoints.count()-1)
+		return controlPointIndex;
+
+	const auto& prev = _controlPoints[controlPointIndex-1];
+	const auto& curr = _controlPoints[controlPointIndex];
+	const auto& next = _controlPoints[controlPointIndex+1];
+
+	if (curr.pos < prev.pos)
+	{
+		_controlPoints.move(controlPointIndex, controlPointIndex-1);
+		return reorderControlPoint(controlPointIndex-1);
+	}
+	else if (curr.pos > next.pos)
+	{
+		_controlPoints.move(controlPointIndex, controlPointIndex+1);
+		return reorderControlPoint(controlPointIndex+1);
+	}
+	else
+	{
+		return controlPointIndex;
+	}
 }
