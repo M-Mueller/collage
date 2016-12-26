@@ -28,10 +28,7 @@ ApplicationWindow {
 
 	Item {
 		anchors.margins: 0
-		anchors.bottom: parent.bottom
-		anchors.right: parent.right
-		anchors.top: parent.top
-		anchors.left: gridLayout1.right
+		anchors.fill: parent
 
 		VolumeRenderer {
 			id: volumeRenderer
@@ -40,9 +37,9 @@ ApplicationWindow {
 
 		Rectangle
 		{
-			id: tfDialog
+			id: options
 			anchors.margins: 4
-			anchors.topMargin: -tfDialogHandle.height
+			anchors.topMargin: -optionsHandle.height
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.bottom: parent.bottom
@@ -59,16 +56,16 @@ ApplicationWindow {
 				State {
 					name: "expanded"
 					AnchorChanges {
-						target: tfDialog
+						target: options
 						anchors.top: undefined
-						anchors.bottom: tfDialog.parent.bottom
+						anchors.bottom: options.parent.bottom
 					}
 				},
 				State {
 					name: "collapsed"
 					AnchorChanges {
-						target: tfDialog
-						anchors.top: tfDialog.parent.bottom
+						target: options
+						anchors.top: options.parent.bottom
 						anchors.bottom: undefined
 					}
 				}
@@ -93,44 +90,126 @@ ApplicationWindow {
 				}
 			]
 
-			TransferFunctionEditor {
-				id: tfEditor
+			RowLayout {
 				anchors.fill: parent
 				anchors.margins: 8
 
-				opacity: 0.6
+				GridLayout {
+					Layout.maximumWidth: 200
+					columnSpacing: 5
+					rowSpacing: 5
+					rows: 3
+					columns: 2
 
-				onTransferFunctionChanged: {
-					volumeRenderer.transferFunction.load(transferFunction)
-					volumeRenderer.update()
-				}
+					anchors.bottom: parent.bottom
+					anchors.top: parent.top
 
-				Component {
-					id: colorPicker
-					TransferFunctionColorPicker {
-						anchors.fill: parent
+					Button {
+						id: reloadShaders
+						text: qsTr("Reload Shaders")
+						Layout.fillWidth: true
+
+						Layout.columnSpan: 2
+
+						onClicked: {
+							volumeRenderer.reloadShaders()
+							volumeRenderer.update()
+						}
+					}
+
+					Label {
+						color: "#ffffff"
+						text: qsTr("Mode:")
+					}
+
+					SpinBox {
+						Layout.fillWidth: true
+						minimumValue: 0
+						maximumValue: 5
+						value: volumeRenderer.mode
+
+						onValueChanged: {
+							tfEditor.visible = value >= 2
+							volumeRenderer.mode = value
+							volumeRenderer.update()
+						}
+					}
+
+					Label {
+						color: "#ffffff"
+						text: qsTr("Window Width:")
+					}
+
+					SpinBox {
+						id: windowWidthSpinBox
+						Layout.fillWidth: true
+						stepSize: 0.1
+						decimals: 2
+						minimumValue: 0.0
+						maximumValue: 1.0
+						value: volumeRenderer.windowWidth
+						onValueChanged: volumeRenderer.windowWidth = value
+					}
+
+					Label {
+						color: "#ffffff"
+						text: qsTr("Window Center:")
+					}
+
+					SpinBox {
+						id: windowCenterSpinBox
+						Layout.fillWidth: true
+						stepSize: 0.1
+						decimals: 2
+						minimumValue: -1.0
+						maximumValue: 1.0
+						value: volumeRenderer.windowCenter
+						onValueChanged: volumeRenderer.windowCenter = value
 					}
 				}
 
-				onControlPointClicked: {
-					var component = Qt.createComponent("PopupMenu.qml")
-					var popup = component.createObject(null)
-					popup.content.sourceComponent = colorPicker
-					popup.parentItem = this
-					popup.origin = origin
-					popup.show()
+				TransferFunctionEditor {
+					id: tfEditor
 
-					popup.finished.connect(function(result) {
-						if (result === "remove")
-							tfEditor.removeControlPoint(controlPoint)
-						else
-							tfEditor.setControlPointColor(controlPoint, result)
-					});
+					Layout.fillWidth: true
+
+					anchors.bottom: parent.bottom
+					anchors.top: parent.top
+
+					opacity: 0.6
+
+					onTransferFunctionChanged: {
+						volumeRenderer.transferFunction.load(transferFunction)
+						volumeRenderer.update()
+					}
+
+					Component {
+						id: colorPicker
+						TransferFunctionColorPicker {
+							anchors.fill: parent
+						}
+					}
+
+					onControlPointClicked: {
+						var component = Qt.createComponent("PopupMenu.qml")
+						var popup = component.createObject(null)
+						popup.content.sourceComponent = colorPicker
+						popup.parentItem = this
+						popup.origin = origin
+						popup.show()
+
+						popup.finished.connect(function(result) {
+							if (result === "remove")
+								tfEditor.removeControlPoint(controlPoint)
+							else
+								tfEditor.setControlPointColor(controlPoint, result)
+						});
+					}
 				}
 			}
 
 			Rectangle {
-				id: tfDialogHandle
+				id: optionsHandle
 				anchors.verticalCenter: parent.top;
 				anchors.horizontalCenter: parent.horizontalCenter
 				height: 24
@@ -146,17 +225,17 @@ ApplicationWindow {
 					anchors.fill: parent
 					source: "qrc:/images/ExpanderIcon.png"
 					rotation: {
-						if (tfDialog.state == "expanded") 0; else 180;
+						if (options.state == "expanded") 0; else 180;
 					}
 				}
 
 				MouseArea {
 					anchors.fill: parent
 					onClicked: {
-						if (tfDialog.state == "collapsed")
-							tfDialog.state = "expanded"
+						if (options.state == "collapsed")
+							options.state = "expanded"
 						else
-							tfDialog.state = "collapsed"
+							options.state = "collapsed"
 						parent.color = "#CCCCCC" // onExited is not called when MouseArea moves
 					}
 					hoverEnabled: true
@@ -167,78 +246,5 @@ ApplicationWindow {
 		}
 	}
 
-	GridLayout {
-		id: gridLayout1
-		width: 194
-		columnSpacing: 5
-		rowSpacing: 5
-		rows: 3
-		columns: 2
-		anchors.left: parent.left
-		anchors.leftMargin: 0
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: 0
-		anchors.top: parent.top
-		anchors.topMargin: 0
-
-		Button {
-			id: reloadShaders
-			text: qsTr("Reload Shaders")
-
-			Layout.columnSpan: 2
-
-			onClicked: {
-				volumeRenderer.reloadShaders()
-				volumeRenderer.update()
-			}
-		}
-
-		Label {
-			color: "#ffffff"
-			text: qsTr("Mode:")
-		}
-
-		SpinBox {
-			minimumValue: 0
-			maximumValue: 5
-			value: volumeRenderer.mode
-
-			onValueChanged: {
-				tfEditor.visible = value >= 2
-				volumeRenderer.mode = value
-				volumeRenderer.update()
-			}
-		}
-
-		Label {
-			color: "#ffffff"
-			text: qsTr("Window Width:")
-		}
-
-		SpinBox {
-			id: windowWidthSpinBox
-			stepSize: 0.1
-			decimals: 2
-			minimumValue: 0.0
-			maximumValue: 1.0
-			value: volumeRenderer.windowWidth
-			onValueChanged: volumeRenderer.windowWidth = value
-		}
-
-		Label {
-			color: "#ffffff"
-			text: qsTr("Window Center:")
-		}
-
-		SpinBox {
-			id: windowCenterSpinBox
-			stepSize: 0.1
-			decimals: 2
-			minimumValue: -1.0
-			maximumValue: 1.0
-			value: volumeRenderer.windowCenter
-			onValueChanged: volumeRenderer.windowCenter = value
-		}
-	}
 }
 
