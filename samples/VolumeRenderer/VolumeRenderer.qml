@@ -14,11 +14,14 @@ Canvas {
 	property int mode: 2
 	property double windowWidth: 1.0
 	property double windowCenter: 0.5
+	property bool lightEnabled: false
 
 	property alias transferFunction: transferFunction
 
+	onModeChanged: update()
 	onWindowWidthChanged: update()
 	onWindowCenterChanged: update()
+	onLightEnabledChanged: update()
 
 	QtQuick.MouseArea {
 		anchors.fill: parent;
@@ -235,7 +238,7 @@ Canvas {
 			property vector3d volumeSize: Qt.vector3d(volume.width, volume.height, volume.depth)
 			property vector3d volumeSpacing: volume.spacing
 
-			property double step: Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z))
+			property double step: 0.5*Math.max(volume.spacing.x, Math.max(volume.spacing.y, volume.spacing.z))
 
 			property double windowWidth: root.windowWidth
 			property double windowCenter: root.windowCenter
@@ -249,6 +252,7 @@ Canvas {
 				property color color: light.color
 			}
 			property vector3d viewer: camera.center()
+			property int lightEnabled: root.lightEnabled
 		}
 
 		ClearFramebuffer {
@@ -256,6 +260,7 @@ Canvas {
 			clearDepthBuffer: true
 		}
 
+		// render fullscreen rectangle
 		Rectangle {
 		}
 	}

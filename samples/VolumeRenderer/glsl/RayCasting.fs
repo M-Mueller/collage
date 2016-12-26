@@ -17,6 +17,7 @@ struct Light
 };
 uniform Light light;
 uniform vec3 viewer;
+uniform bool lightEnabled;
 
 uniform int mode; // 0: iso, 1: maximum, 2: DVR
 uniform float iso;
@@ -155,7 +156,7 @@ Ray maximumIntensityStep(float value, Ray ray)
 Ray directVolumeRenderingStep(float value, Ray ray)
 {
     vec4 color = texture(transferFunction, value);
-    if(mode == 3)
+    if(lightEnabled)
     {
         vec3 normal = computeNormal(ray.position);
         color.rgb = computePhongShading(ray.position, normal, color.rgb);
@@ -182,12 +183,12 @@ void main()
         return;
     }
 
-    if(mode == 4)
+    if(mode == 3)
     {
         out_color = vec4(worldToVoxel(rayEnter.xyz), 1.0);
         return;
     }
-    if(mode == 5)
+    if(mode == 4)
     {
         out_color = vec4(worldToVoxel(rayExit.xyz), 1.0);
         return;
@@ -208,7 +209,7 @@ void main()
             ray = isoSurfaceStep(value, ray);
         else if(mode == 1)
             ray = maximumIntensityStep(value, ray);
-        else if(mode == 2 || mode == 3)
+        else if(mode == 2)
             ray = directVolumeRenderingStep(value, ray);
 
         if(ray.terminate)

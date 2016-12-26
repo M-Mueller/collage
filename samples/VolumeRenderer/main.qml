@@ -96,16 +96,13 @@ ApplicationWindow {
 
 				GridLayout {
 					Layout.maximumWidth: 200
+					Layout.fillHeight: true
+
 					columnSpacing: 5
 					rowSpacing: 5
-					rows: 3
 					columns: 2
 
-					anchors.bottom: parent.bottom
-					anchors.top: parent.top
-
 					Button {
-						id: reloadShaders
 						text: qsTr("Reload Shaders")
 						Layout.fillWidth: true
 
@@ -118,51 +115,59 @@ ApplicationWindow {
 					}
 
 					Label {
-						color: "#ffffff"
 						text: qsTr("Mode:")
 					}
 
 					ComboBox {
 						Layout.fillWidth: true
 
-						model: [ "ISO", "MIP", "DVR", "DVR (shaded)", "Dbg Entry", "Dbg Exit"]
+						model: [ "ISO", "MIP", "DVR", "Dbg Entry", "Dbg Exit"]
 						currentIndex: volumeRenderer.mode
 
-						onCurrentIndexChanged: {
-							volumeRenderer.mode = currentIndex
-							volumeRenderer.update()
-						}
+						onCurrentIndexChanged: volumeRenderer.mode = currentIndex
 					}
 
 					Label {
-						color: "#ffffff"
+						text: qsTr("Lighting")
+					}
+
+					CheckBox {
+						Layout.fillWidth: true
+
+						checked: volumeRenderer.lightEnabled
+
+						onCheckedChanged: volumeRenderer.lightEnabled = checked
+					}
+
+					Label {
 						text: qsTr("Window Width:")
 					}
 
 					SpinBox {
-						id: windowWidthSpinBox
 						Layout.fillWidth: true
+
 						stepSize: 0.1
 						decimals: 2
 						minimumValue: 0.0
 						maximumValue: 1.0
 						value: volumeRenderer.windowWidth
+
 						onValueChanged: volumeRenderer.windowWidth = value
 					}
 
 					Label {
-						color: "#ffffff"
 						text: qsTr("Window Center:")
 					}
 
 					SpinBox {
-						id: windowCenterSpinBox
 						Layout.fillWidth: true
+
 						stepSize: 0.1
 						decimals: 2
 						minimumValue: -1.0
 						maximumValue: 1.0
 						value: volumeRenderer.windowCenter
+
 						onValueChanged: volumeRenderer.windowCenter = value
 					}
 				}
@@ -171,6 +176,7 @@ ApplicationWindow {
 					id: tfEditor
 
 					Layout.fillWidth: true
+					Layout.fillHeight: true
 
 					anchors.bottom: parent.bottom
 					anchors.top: parent.top
