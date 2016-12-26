@@ -122,15 +122,14 @@ ApplicationWindow {
 						text: qsTr("Mode:")
 					}
 
-					SpinBox {
+					ComboBox {
 						Layout.fillWidth: true
-						minimumValue: 0
-						maximumValue: 5
-						value: volumeRenderer.mode
 
-						onValueChanged: {
-							tfEditor.visible = value >= 2
-							volumeRenderer.mode = value
+						model: [ "ISO", "MIP", "DVR", "DVR (shaded)", "Dbg Entry", "Dbg Exit"]
+						currentIndex: volumeRenderer.mode
+
+						onCurrentIndexChanged: {
+							volumeRenderer.mode = currentIndex
 							volumeRenderer.update()
 						}
 					}
